@@ -1,0 +1,71 @@
+{
+    "streams": [
+        {
+            "name": "stream-1",
+            "enable": true,
+            "channel_size": 1000,
+            "source": [
+                {
+                    "type": "Kafka",
+                    "source_name": "kafka-1",
+                    "kafka": {
+                        "address": "<Kafka Hosts>",
+                        "group": "<Kafka Group>",
+                        "topic": "<Kafka Topic>"
+                    }
+                }
+            ],
+            "transform": {
+                "mode": "json",
+                "schemas": [
+                    {
+                        "source_key": "col1",
+                        "sink_key":  "col1",
+                        "converter": "toInt32",
+                        "is_ignore": false,
+                        "is_strict_mode": true,
+                        "source_name": "kafka-1",
+                        "sink_name": "clickhouse-1"
+                    },
+                    {
+                        "source_key": "col2",
+                        "sink_key":  "col2",
+                        "converter": "toFloat32",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "source_name": "kafka-1",
+                        "sink_name": "clickhouse-1"
+                    },
+                    {
+                        "source_key": "col3",
+                        "sink_key":  "col3",
+                        "converter": "toString",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "source_name": "kafka-1",
+                        "sink_name": "clickhouse-1"
+                    }
+                ]
+            },
+            "sink": [
+                {
+                    "type": "ClickHouse",
+                    "sink_name": "clickhouse-1",
+                    "clickhouse" : {
+                        "address": "<Clickhouse Hosts>",
+                        "username": "<Clickhouse Username>",
+                        "password": "<Clickhouse Password>",
+                        "database": "<Clickhouse Database Name>",
+                        "bulk_size": 100,
+                        "table_name": "<Clickhouse Table Name>",
+                        "columns": [
+                            {"name": "col1", "type": "Int32"},
+                            {"name": "col2", "type": "Float32"},
+                            {"name": "col3", "type": "String"}
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

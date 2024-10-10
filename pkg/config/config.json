@@ -1,0 +1,9 @@
+{
+    "config": {
+        "from": "local",
+        "local": {
+            "path": "config.json"
+        }
+    },
+    "streams": []
+}

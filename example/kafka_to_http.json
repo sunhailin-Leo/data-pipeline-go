@@ -1,0 +1,90 @@
+{
+    "streams": [
+        {
+            "name": "stream-1",
+            "enable": true,
+            "channel_size": 1000,
+            "source": [
+                {
+                    "type": "Kafka",
+                    "source_name": "kafka-1",
+                    "kafka": {
+                        "address": "<Kafka Hosts>",
+                        "group": "<Kafka Group>",
+                        "topic": "<Kafka Topic>"
+                    }
+                }
+            ],
+            "transform": {
+                "mode": "json",
+                "schemas": [
+                    {
+                        "source_key": "col1",
+                        "sink_key":  "col1",
+                        "converter": "toInt32",
+                        "is_ignore": false,
+                        "is_strict_mode": true,
+                        "is_keep_keys": true,
+                        "source_name": "kafka-1",
+                        "sink_name": "http-1"
+                    },
+                    {
+                        "source_key": "col2",
+                        "sink_key":  "col2",
+                        "converter": "toFloat32",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "is_keep_keys": true,
+                        "source_name": "kafka-1",
+                        "sink_name": "http-1"
+                    },
+                    {
+                        "source_key": "col3",
+                        "sink_key":  "col3",
+                        "converter": "toString",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "is_keep_keys": true,
+                        "source_name": "kafka-1",
+                        "sink_name": "http-1"
+                    },
+                    {
+                        "source_key": "col4",
+                        "sink_key":  "col4",
+                        "converter": "",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "is_keep_keys": true,
+                        "source_name": "kafka-1",
+                        "sink_name": "http-1"
+                    },
+                    {
+                        "source_key": "col5",
+                        "sink_key":  "col5",
+                        "converter": "",
+                        "is_ignore": false,
+                        "is_strict_mode": false,
+                        "is_keep_keys": true,
+                        "is_expand": true,
+                        "expand_value": "20240811",
+                        "source_name": "kafka-1",
+                        "sink_name": "http-1"
+                    }
+                ]
+            },
+            "sink": [
+                {
+                    "type": "HTTP",
+                    "sink_name": "http-1",
+                    "http": {
+                        "url": "http://localhost:8080/api/v1",
+                        "content_type": "application/json",
+                        "headers": {
+                            "key": "value"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{{- $lastIndex := sub (len .Columns) 1 -}}
+CREATE TABLE IF NOT EXISTS {{.Database}}.{{.TableName}}(
+    {{- range $index, $element := .Columns }}
+    {{$element.Name}} {{$element.Type}} {{if $element.Comment}}COMMENT '{{$element.Comment}}'{{end}} {{if $element.Compress}}CODEC({{$element.Compress}}){{end}}{{if lt $index $lastIndex}},{{end}}
+    {{- end }}
+) ENGINE = {{.Engine}} PARTITION BY ({{joinWith .Partition ","}})
+    PRIMARY KEY ({{joinWith .PrimaryKey ","}})
+    {{if .OrderBy -}}
+    ORDER BY ({{joinWith .OrderBy ","}})
+    {{end}}
+    {{- if .TTL -}}
+    TTL {{.TTL}}
+    {{end}}
+    {{- if .Settings -}}
+    SETTINGS {{joinWith .Settings ","}}
+    {{end}}
+    {{- if .Comment -}}
+    COMMENT '{{.Comment}}'
+    {{end}} ;

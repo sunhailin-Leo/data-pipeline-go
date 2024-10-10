@@ -1,0 +1,59 @@
+# ROADMAP
+
+# New Features:
+
+- [X] Source
+    - [X] Kafka
+    - [X] RocketMQ
+    - [X] Redis
+        - [X] List
+            - [X] LPop
+            - [X] RPop
+        - [X] Pub/Sub
+            - [X] Subscribe(default using PSubscribe)
+    - [X] Pulsar
+    - [X] RabbitMQ
+    - [X] Prometheus metrics exporter(etc. get /metrics)
+- [X] Sink
+    - [X] ClickHouse
+    - [X] Console
+    - [X] HTTP
+        - [X] POST
+        - [ ] GET (temporary not support)
+    - [X] Kafka
+    - [X] Redis
+        - [X] K/V
+            - [X] Set
+        - [X] Hash
+            - [X] HSet
+        - [X] List
+            - [X] LPush
+            - [X] RPush
+        - [X] Set
+            - [X] SAdd
+        - [X] Pub/Sub
+            - [X] Publish
+    - [X] PostgresSQL
+    - [ ] Elasticsearch 7/8
+    - [X] LocalFile
+        - [X] text(like txt)
+        - [X] csv
+        - [ ] parquet (temporary not support)
+    - [X] Pulsar
+    - [X] RabbitMQ
+    - [X] RocketMQ
+    - [X] MySQL
+    - [X] Oracle
+- [X] transform
+    - [X] DataType Cast
+    - [X] K-V Expand
+    - [X] K-V Filter
+    - [X] K-V Strict Mode
+- [X] config center
+    - [X] Local
+    - [X] Apollo
+    - [ ] Redis
+    - [ ] Nacos
+    - [ ] Zookeeper
+- [X] Prometheus
+- [X] pprof
