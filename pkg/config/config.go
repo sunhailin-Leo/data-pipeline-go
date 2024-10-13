@@ -69,6 +69,11 @@ type ApolloConfig struct {
 
 // RedisConfig read config from Redis
 type RedisConfig struct {
+	Host      string `json:"host"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	DB        int    `json:"db"`
+	ConfigKey string `json:"config_key"`
 }
 
 // Config source from configuration
