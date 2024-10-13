@@ -48,8 +48,10 @@ func (b *BaseTransform) To() {
 	panic("implement To")
 }
 
-func (b *BaseTransform) InitTransform(_ config.TransformConfig, _ int) Transform {
-	panic("implement InitTransform")
+func (b *BaseTransform) InitTransform(configs config.TransformConfig, chanSize int) Transform {
+	b.configs = configs
+	b.initChannel(chanSize)
+	return b
 }
 
 func (b *BaseTransform) CloseTransform() {

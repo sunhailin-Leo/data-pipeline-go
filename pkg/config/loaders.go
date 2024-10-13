@@ -63,10 +63,15 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Apollo config error, reason: host is empty")
 		os.Exit(1)
 	}
+	apolloAppId := c.config.Config.Apollo.AppID
+	if apolloAppId == "" {
+		apolloAppId = utils.ServiceName
+		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: appId is empty, use default appId instead")
+	}
 	logger.Logger.Info(utils.LogServiceName + "Current using Apollo host: " + apolloHost)
 
 	cfg := &config.AppConfig{
-		AppID:             utils.ServiceName,
+		AppID:             apolloAppId,
 		Cluster:           c.config.Config.Apollo.ClusterKey,
 		IP:                apolloHost,
 		NamespaceName:     c.config.Config.Apollo.Namespace,

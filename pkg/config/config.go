@@ -61,6 +61,7 @@ type LocalFileConfig struct {
 // ApolloConfig read config from Apollo
 type ApolloConfig struct {
 	Host       string `json:"host"`
+	AppID      string `json:"app_id"`
 	Namespace  string `json:"namespace"`
 	ClusterKey string `json:"cluster_key"`
 	ConfigKey  string `json:"config_key"`
