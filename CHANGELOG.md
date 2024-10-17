@@ -1,5 +1,6 @@
 * 2024-10-17 v0.2.1
   * Supported Elasticsearch 7/8 sink
+  * Refactor config loader use viper to instead
 
 * 2024-10-16 v0.2.0
   * Supported jsonPath mode in transform module

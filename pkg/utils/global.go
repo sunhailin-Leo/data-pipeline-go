@@ -24,6 +24,19 @@ const (
 	ConfigFromApolloTagName string = "apollo"
 	ConfigFromRedisTagName  string = "redis"
 
+	ConfigFromSourceName          string = "CONFIG_SRC"         // Required
+	ConfigFromLocalPathEnvName    string = "LOCAL_PATH"         // If CONFIG_SRC = local, then required
+	ConfigFromApolloEnvHost       string = "APOLLO_HOST"        // If CONFIG_SRC = apollo, then required
+	ConfigFromApolloEnvAppId      string = "APOLLO_APP_ID"      // optional
+	ConfigFromApolloEnvNamespace  string = "APOLLO_NAMESPACE"   // optional
+	ConfigFromApolloEnvClusterKey string = "APOLLO_CLUSTER_KEY" // optional
+	ConfigFromApolloEnvConfigKey  string = "APOLLO_CONFIG_KEY"  // If CONFIG_SRC = apollo, then required
+	ConfigFromRedisEnvHost        string = "REDIS_HOST"         // If CONFIG_SRC = redis, then required
+	ConfigFromRedisEnvUsername    string = "REDIS_USERNAME"     // optional
+	ConfigFromRedisEnvPassword    string = "REDIS_PASSWORD"     // optional
+	ConfigFromRedisEnvDBNum       string = "REDIS_DB"           // optional
+	ConfigFromRedisEnvConfigKey   string = "REDIS_CONFIG_KEY"   // If CONFIG_SRC = redis, then required
+
 	SourceKafkaTagName       string = "Kafka"
 	SourceRocketMQTagName    string = "RocketMQ"
 	SourceRabbitMQTagName    string = "RabbitMQ"

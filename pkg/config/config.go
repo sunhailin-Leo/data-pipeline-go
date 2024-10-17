@@ -62,37 +62,6 @@ type SinkConfig struct {
 	Elasticsearch ElasticsearchSinkConfig `json:"elasticsearch"`
 }
 
-// LocalFileConfig read config from local
-type LocalFileConfig struct {
-	Path string `json:"path"`
-}
-
-// ApolloConfig read config from Apollo
-type ApolloConfig struct {
-	Host       string `json:"host"`
-	AppID      string `json:"app_id"`
-	Namespace  string `json:"namespace"`
-	ClusterKey string `json:"cluster_key"`
-	ConfigKey  string `json:"config_key"`
-}
-
-// RedisConfig read config from Redis
-type RedisConfig struct {
-	Host      string `json:"host"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	DB        int    `json:"db"`
-	ConfigKey string `json:"config_key"`
-}
-
-// Config source from configuration
-type Config struct {
-	From   string          `json:"from"`
-	Local  LocalFileConfig `json:"local"`
-	Apollo ApolloConfig    `json:"apollo"`
-	Redis  RedisConfig     `json:"redis"`
-}
-
 // StreamConfig stream config
 type StreamConfig struct {
 	Name          string          `json:"name"`         // stream name
@@ -146,6 +115,5 @@ func (s *StreamConfig) GetSinkTagBySinkName(name string) string {
 
 // TunnelConfig data tunnel config struct.
 type TunnelConfig struct {
-	Config  *Config         `json:"config"`
 	Streams []*StreamConfig `json:"streams"`
 }
