@@ -23,6 +23,7 @@ const (
 	ConfigFromLocalTagName  string = "local"
 	ConfigFromApolloTagName string = "apollo"
 	ConfigFromRedisTagName  string = "redis"
+	ConfigFromNacosTagName  string = "nacos"
 
 	ConfigFromSourceName          string = "CONFIG_SRC"         // Required
 	ConfigFromLocalPathEnvName    string = "LOCAL_PATH"         // If CONFIG_SRC = local, then required
@@ -36,6 +37,11 @@ const (
 	ConfigFromRedisEnvPassword    string = "REDIS_PASSWORD"     // optional
 	ConfigFromRedisEnvDBNum       string = "REDIS_DB"           // optional
 	ConfigFromRedisEnvConfigKey   string = "REDIS_CONFIG_KEY"   // If CONFIG_SRC = redis, then required
+	ConfigFromNacosEnvServerIP    string = "NACOS_IP"           // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvServerPort  string = "NACOS_PORT"         // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvNamespaceId string = "NACOS_NAMESPACE_ID" // optional
+	ConfigFromNacosEnvDataId      string = "NACOS_DATA_ID"      // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvGroup       string = "NACOS_GROUP"        // If CONFIG_SRC = nacos, then required
 
 	SourceKafkaTagName       string = "Kafka"
 	SourceRocketMQTagName    string = "RocketMQ"

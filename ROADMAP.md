@@ -56,7 +56,7 @@
     - [X] Local
     - [X] Apollo
     - [X] Redis
-    - [ ] Nacos
+    - [X] Nacos
     - [ ] Zookeeper
 - [X] Prometheus
 - [X] pprof

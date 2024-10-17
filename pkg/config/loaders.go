@@ -3,12 +3,15 @@ package config
 import (
 	"context"
 	_ "embed"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"os"
 	"strings"
 
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/bytedance/sonic"
+	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
@@ -42,6 +45,12 @@ func (c *TunnelConfigLoader) bindAllConfigEnv() {
 	_ = viper.BindEnv(utils.ConfigFromRedisEnvPassword)
 	_ = viper.BindEnv(utils.ConfigFromRedisEnvDBNum)
 	_ = viper.BindEnv(utils.ConfigFromRedisEnvConfigKey)
+	// Nacos
+	_ = viper.BindEnv(utils.ConfigFromNacosEnvServerIP)
+	_ = viper.BindEnv(utils.ConfigFromNacosEnvServerPort)
+	_ = viper.BindEnv(utils.ConfigFromNacosEnvNamespaceId)
+	_ = viper.BindEnv(utils.ConfigFromNacosEnvDataId)
+	_ = viper.BindEnv(utils.ConfigFromNacosEnvGroup)
 }
 
 func (c *TunnelConfigLoader) IsConfigLoaded() bool {
@@ -223,6 +232,70 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 	// TODO 后续再实现实时更新的操作
 }
 
+func (c *TunnelConfigLoader) loadFromNacos() {
+	// Nacos host and port
+	nacosHostObj := viper.Get(utils.ConfigFromNacosEnvServerIP)
+	nacosPortObj := viper.Get(utils.ConfigFromNacosEnvServerPort)
+	if nacosHostObj == nil || nacosPortObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load Nacos config error, reason: NACOS_IP or NACOS_PORT is empty")
+		os.Exit(1)
+	}
+
+	// Nacos namespace id
+	var nacosNamespaceId string
+	nacosNamespaceIdObj := viper.Get(utils.ConfigFromNacosEnvNamespaceId)
+	if nacosNamespaceIdObj != nil {
+		nacosNamespaceId = cast.ToString(nacosNamespaceIdObj)
+	}
+
+	// Nacos server config (not support multi cluster mode)
+	serverConfigs := []constant.ServerConfig{
+		{
+			IpAddr: cast.ToString(nacosHostObj),
+			Port:   cast.ToUint64(nacosPortObj),
+		},
+	}
+
+	// Nacos client config
+	clientConfig := constant.ClientConfig{
+		NamespaceId:         nacosNamespaceId, // 如果不需要命名空间，可以留空
+		TimeoutMs:           5000,
+		NotLoadCacheAtStart: true,
+		LogDir:              "/tmp/nacos/log",
+		CacheDir:            "/tmp/nacos/cache",
+		LogLevel:            "debug",
+	}
+	// create config client
+	configClient, createClientErr := clients.CreateConfigClient(map[string]interface{}{
+		"serverConfigs": serverConfigs,
+		"clientConfig":  clientConfig,
+	})
+	if createClientErr != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "failed to create Nacos client, Reason for exception: " + createClientErr.Error())
+		return
+	}
+
+	nacosDataIdObj := viper.Get(utils.ConfigFromNacosEnvDataId)
+	nacosGroupObj := viper.Get(utils.ConfigFromNacosEnvGroup)
+	if nacosDataIdObj == nil || nacosGroupObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load Nacos config error, reason: NACOS_DATA_ID or NACOS_GROUP is empty")
+		os.Exit(1)
+	}
+
+	// get config
+	content, getConfigErr := configClient.GetConfig(vo.ConfigParam{
+		DataId: cast.ToString(nacosDataIdObj),
+		Group:  cast.ToString(nacosGroupObj),
+	})
+	if getConfigErr != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "failed to get Nacos config, Reason for exception: " + getConfigErr.Error())
+		return
+	}
+	TunnelCfg = c.loadFile([]byte(content))
+	logger.Logger.Info(utils.LogServiceName + "Load Nacos config is successful!")
+	// TODO live reload
+}
+
 // Load load config api
 func (c *TunnelConfigLoader) Load() {
 	// bind viper setting
@@ -246,6 +319,8 @@ func (c *TunnelConfigLoader) Load() {
 		c.loadFromApollo()
 	case utils.ConfigFromRedisTagName:
 		c.loadFromRedis()
+	case utils.ConfigFromNacosTagName:
+		c.loadFromNacos()
 	default:
 		logger.Logger.Fatal(utils.LogServiceName + "config load error! CONFIG_SRC env is unsupported!")
 		os.Exit(1)
