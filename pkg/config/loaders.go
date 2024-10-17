@@ -1,12 +1,15 @@
 package config
 
 import (
+	"context"
 	_ "embed"
 	"os"
+	"strings"
 
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/bytedance/sonic"
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/exp/mmap"
 
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
@@ -20,6 +23,7 @@ type TunnelConfigLoader struct {
 	config *TunnelConfig
 
 	apolloClient agollo.Client
+	redisClient  redis.UniversalClient
 }
 
 func (c *TunnelConfigLoader) IsConfigLoaded() bool {
@@ -63,10 +67,15 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Apollo config error, reason: host is empty")
 		os.Exit(1)
 	}
+	apolloAppId := c.config.Config.Apollo.AppID
+	if apolloAppId == "" {
+		apolloAppId = utils.ServiceName
+		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: appId is empty, use default appId instead")
+	}
 	logger.Logger.Info(utils.LogServiceName + "Current using Apollo host: " + apolloHost)
 
 	cfg := &config.AppConfig{
-		AppID:             utils.ServiceName,
+		AppID:             apolloAppId,
 		Cluster:           c.config.Config.Apollo.ClusterKey,
 		IP:                apolloHost,
 		NamespaceName:     c.config.Config.Apollo.Namespace,
@@ -102,7 +111,26 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 }
 
 func (c *TunnelConfigLoader) loadFromRedis() {
-	panic("implement loadFromRedis")
+	client := redis.NewUniversalClient(&redis.UniversalOptions{
+		Addrs:    strings.Split(c.config.Config.Redis.Host, ","),
+		Username: c.config.Config.Redis.Username,
+		Password: c.config.Config.Redis.Password,
+		DB:       c.config.Config.Redis.DB,
+	})
+	if pingErr := client.Ping(context.Background()).Err(); pingErr != nil {
+		logger.Logger.Error(utils.LogServiceName + "Failed to connect Redis! Reason for exception: " + pingErr.Error())
+		return
+	}
+	c.redisClient = client
+
+	rConfig, getErr := c.redisClient.Get(context.Background(), c.config.Config.Redis.ConfigKey).Result()
+	if getErr != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "load Redis config error,reason: " + getErr.Error())
+		return
+	}
+	TunnelCfg = c.loadFile([]byte(rConfig))
+	logger.Logger.Info(utils.LogServiceName + "Load Redis config is successful!")
+	// TODO 后续再实现实时更新的操作
 }
 
 // Load load config api

@@ -186,8 +186,7 @@ func (t *Handler) To() {
 
 // InitTransform init transform module
 func (t *Handler) InitTransform(transformConfig config.TransformConfig, chanSize int) Transform {
-	t.configs = transformConfig
-	t.initChannel(chanSize)
+	t.BaseTransform.InitTransform(transformConfig, chanSize)
 	logger.Logger.Info(utils.LogServiceName + "Transform initialize successful!")
 	return t
 }

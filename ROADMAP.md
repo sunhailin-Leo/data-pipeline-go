@@ -1,6 +1,8 @@
 # ROADMAP
 
-# New Features:
+---
+
+## New Features:
 
 - [X] Source
     - [X] Kafka
@@ -52,7 +54,7 @@
 - [X] config center
     - [X] Local
     - [X] Apollo
-    - [ ] Redis
+    - [X] Redis
     - [ ] Nacos
     - [ ] Zookeeper
 - [X] Prometheus
