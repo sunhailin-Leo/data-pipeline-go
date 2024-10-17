@@ -20,37 +20,46 @@ type TransformSchema struct {
 	SourceKey    string `json:"source_key"`
 	SinkKey      string `json:"sink_key"`
 	Converter    string `json:"converter"`      // Converter, Like: toInt, toFloat32, toString, etc.
-	IsIgnore     bool   `json:"is_ignore"`      // is ignore key
+	IsIgnore     bool   `json:"is_ignore"`      // is ignored key
 	IsStrictMode bool   `json:"is_strict_mode"` // is strict mode
 	IsKeepKeys   bool   `json:"is_keep_keys"`   // key is keep origin key
-	IsExpand     bool   `json:"is_expand"`      // is expand col
+	IsExpand     bool   `json:"is_expand"`      // is expanded col
 	ExpandValue  any    `json:"expand_value"`   // expand value
 	SourceName   string `json:"source_name"`
 	SinkName     string `json:"sink_name"`
 }
 
+// TransformJsonPath transform json path config
+type TransformJsonPath struct {
+	SrcField  string `json:"src_field"`  // source field
+	Path      string `json:"path"`       // json path
+	DestField string `json:"dest_field"` // destination field
+}
+
 // TransformConfig transform config
 type TransformConfig struct {
-	Mode         string            `json:"mode"`          // Mode: row, json
-	Schemas      []TransformSchema `json:"schemas"`       // Schema
-	RowSeparator string            `json:"row_separator"` // only mode is row will affect, and also only row mode will use strings.Split to split
+	Mode         string              `json:"mode"`          // Mode: row, json
+	Schemas      []TransformSchema   `json:"schemas"`       // Schema
+	RowSeparator string              `json:"row_separator"` // only mode is row will affect, and also only row mode will use strings.Split to split
+	Paths        []TransformJsonPath `json:"paths"`         // json paths
 }
 
 // SinkConfig Sink config
 type SinkConfig struct {
-	Type        string                `json:"type"`
-	SinkName    string                `json:"sink_name"`
-	Clickhouse  ClickhouseSinkConfig  `json:"clickhouse"`
-	HTTP        HTTPSinkConfig        `json:"http"`
-	Kafka       KafkaSinkConfig       `json:"kafka"`
-	Redis       RedisSinkConfig       `json:"redis"`
-	LocalFile   LocalFileSinkConfig   `json:"local_file"`
-	PostgresSQL PostgresSQLSinkConfig `json:"postgres_sql"`
-	RocketMQ    RocketMQSinkConfig    `json:"rocketmq"`
-	RabbitMQ    RabbitMQSinkConfig    `json:"rabbitmq"`
-	Oracle      OracleSinkConfig      `json:"oracle"`
-	MySQL       MySQLSinkConfig       `json:"mysql"`
-	Pulsar      PulsarSinkConfig      `json:"pulsar"`
+	Type          string                  `json:"type"`
+	SinkName      string                  `json:"sink_name"`
+	Clickhouse    ClickhouseSinkConfig    `json:"clickhouse"`
+	HTTP          HTTPSinkConfig          `json:"http"`
+	Kafka         KafkaSinkConfig         `json:"kafka"`
+	Redis         RedisSinkConfig         `json:"redis"`
+	LocalFile     LocalFileSinkConfig     `json:"local_file"`
+	PostgresSQL   PostgresSQLSinkConfig   `json:"postgres_sql"`
+	RocketMQ      RocketMQSinkConfig      `json:"rocketmq"`
+	RabbitMQ      RabbitMQSinkConfig      `json:"rabbitmq"`
+	Oracle        OracleSinkConfig        `json:"oracle"`
+	MySQL         MySQLSinkConfig         `json:"mysql"`
+	Pulsar        PulsarSinkConfig        `json:"pulsar"`
+	Elasticsearch ElasticsearchSinkConfig `json:"elasticsearch"`
 }
 
 // LocalFileConfig read config from local
@@ -87,7 +96,7 @@ type Config struct {
 // StreamConfig stream config
 type StreamConfig struct {
 	Name          string          `json:"name"`         // stream name
-	Enable        bool            `json:"enable"`       // is enable stream
+	Enable        bool            `json:"enable"`       // is enabled stream
 	ChannelSize   int             `json:"channel_size"` // 通道缓冲区大小（用于削峰，不给默认 0）
 	Source        []*SourceConfig `json:"source"`       // 数据源配置项
 	SourceAckMode int             `json:"ack_mode"`     // 仅当 Source 时 MQ 组件才有效; 0: 消费后提交; 1: 转换成功后提交; 2: 发送后提交

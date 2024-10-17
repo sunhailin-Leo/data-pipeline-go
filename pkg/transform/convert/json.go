@@ -65,7 +65,7 @@ func JsonMode(
 		}
 		// Whether it is an extended field (allow sender not to provide it, add it in transform module)
 		if schema.IsExpand && jsonData[schema.SourceKey] == nil {
-			jsonData[schema.SourceKey] = schema.ExpandValue
+			jsonData[schema.SourceKey] = CastFunctionNameToFunctionResult(schema.ExpandValue)
 		}
 		// Data conversion and generation of corresponding structures
 		generateConvertResultData(schema.SinkName, resultData,

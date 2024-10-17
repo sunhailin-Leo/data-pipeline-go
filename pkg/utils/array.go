@@ -29,3 +29,12 @@ func StringSliceToMap(keys []string, value []any) map[string]any {
 	}
 	return result
 }
+
+// StringSliceToInterface []string to []any
+func StringSliceToInterface(slice []string) []interface{} {
+	s := make([]interface{}, len(slice))
+	for i, x := range slice {
+		s[i] = any(x)
+	}
+	return s
+}

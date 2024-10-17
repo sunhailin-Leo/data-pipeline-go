@@ -52,6 +52,16 @@ func (t *Handler) sourceTransformModeSelector(sourceData *models.SourceOutput) *
 			SourceOutput:      sourceData,
 			BeforeConvertData: convert.JsonToMap(t.sourceDataSelector(sourceData).([]byte)),
 		}
+	case utils.TransformJsonPathMode:
+		if t.configs.Paths == nil {
+			logger.Logger.Fatal(utils.LogServiceName + "[Transform-From]JsonPath paths not config!")
+			return nil
+		}
+		return &models.TransformBeforeConvert{
+			SourceOutput:      sourceData,
+			BeforeConvertData: convert.JsonPathToMap(t.sourceDataSelector(sourceData).([]byte), t.configs.Paths),
+		}
+
 	default:
 		logger.Logger.Error(utils.LogServiceName + "[Transform-From]unknown transform mode!")
 		return nil
@@ -84,7 +94,7 @@ func (t *Handler) ConvertModeSelector(beforeConvertData *models.TransformBeforeC
 	switch t.configs.Mode {
 	case utils.TransformRowMode:
 		return convert.RowMode(beforeConvertData, t.configs)
-	case utils.TransformJsonMode:
+	case utils.TransformJsonMode, utils.TransformJsonPathMode:
 		/*
 			Json Mode:
 				根据 ==> t.runningCfg:

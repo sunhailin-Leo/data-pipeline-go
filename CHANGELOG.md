@@ -1,3 +1,12 @@
+* 2024-10-17 v0.2.1
+  * Supported Elasticsearch 7/8 sink
+
+* 2024-10-16 v0.2.0
+  * Supported jsonPath mode in transform module
+
+* 2024-10-14 v0.1.9
+  * Remove parquet support
+
 * 2024-10-10 v0.1.8
   * Adjust some code structures to be more consistent with design patterns
 

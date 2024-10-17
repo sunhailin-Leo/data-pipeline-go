@@ -59,7 +59,7 @@ type RedisSinkConfig struct {
 // LocalFileSinkConfig LocalFile Sink config
 type LocalFileSinkConfig struct {
 	FileName       string `json:"file_name"`
-	FileFormatType string `json:"file_format_type"` // file format type: text, csv, parquet(temporary not support)
+	FileFormatType string `json:"file_format_type"` // file format type: text, csv
 	RowDelimiter   string `json:"row_delimiter"`    // only file_format_type = text is affect
 }
 
@@ -115,4 +115,14 @@ type MySQLSinkConfig struct {
 type PulsarSinkConfig struct {
 	Address string `json:"address"` // Pulsar host
 	Topic   string `json:"topic"`   // Pulsar Topic
+}
+
+// ElasticsearchSinkConfig Elasticsearch Sink config
+type ElasticsearchSinkConfig struct {
+	Address   string `json:"address"`     // Elasticsearch address
+	Username  string `json:"username"`    // Elasticsearch username
+	Password  string `json:"password"`    // Elasticsearch password
+	IndexName string `json:"index_name"`  // Elasticsearch index name
+	DocIdName string `json:"doc_id_name"` // Elasticsearch document id name (will take it from transform data)
+	Version   string `json:"version"`     // Only use 7.X or 8.X
 }

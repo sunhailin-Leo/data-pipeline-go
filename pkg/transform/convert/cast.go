@@ -1,6 +1,7 @@
 package convert
 
 import (
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"strings"
 
 	"github.com/bytedance/sonic"
@@ -15,6 +16,26 @@ func generateConvertResultData(sinkNames string, resultData map[string][]any, af
 	for _, sinkName := range strings.Split(sinkNames, ",") {
 		resultData[sinkName] = append(resultData[sinkName], afterCastData)
 	}
+}
+
+// JsonPathToMap json path to map
+func JsonPathToMap(data []byte, paths []config.TransformJsonPath) map[string]any {
+	result := make(map[string]any)
+	for _, path := range paths {
+		node, getNodeErr := sonic.Get(data, utils.StringSliceToInterface(strings.Split(path.Path, "."))...)
+		if getNodeErr != nil {
+			logger.Logger.Error(utils.LogServiceName + "[JsonPathToMap]Failed to get node from origin data! Error Cause: " + getNodeErr.Error())
+			continue
+		}
+		pathRes, getPathErr := node.Interface()
+		if getPathErr != nil {
+			logger.Logger.Error(utils.LogServiceName + "[JsonPathToMap]Failed to get node result! Error Cause: " + getPathErr.Error())
+			continue
+		}
+		result[path.DestField] = pathRes
+	}
+
+	return result
 }
 
 // JsonToMap json to map
@@ -143,8 +164,45 @@ func CastTypes(data any, convertorName string) any {
 			return nil
 		}
 		return v
+	case "toStringMap":
+		v, err := cast.ToStringMapE(data)
+		if err != nil {
+			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toStringMap]Data conversion failed! Reason for error: " + err.Error())
+			return nil
+		}
+		return v
 	default:
 		logger.Logger.Error(utils.LogServiceName + "[CastTypes-convertMap]unknown convertor!")
 		return nil
+	}
+}
+
+// CastTypesDefaultValue data type default value
+func CastTypesDefaultValue(convertorName string) any {
+	if convertorName == "" {
+		return nil
+	}
+
+	switch convertorName {
+	case "toBool":
+		return false
+	case "toFloat64", "toFloat32":
+		return 0.0
+	case "toInt64", "toInt32", "toInt16", "toInt8", "toInt", "toUint", "toUint64", "toUint32", "toUint16", "toUint8":
+		return 0
+	case "toString":
+		return ""
+	default:
+		return nil
+	}
+}
+
+// CastFunctionNameToFunctionResult if value is special function then return function result
+func CastFunctionNameToFunctionResult(value any) any {
+	switch value {
+	case "$.UUID()":
+		return utils.GetUUID()
+	default:
+		return value
 	}
 }
