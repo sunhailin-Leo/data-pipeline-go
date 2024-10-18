@@ -2,16 +2,17 @@ package config
 
 import (
 	"context"
-	_ "embed"
-	"github.com/nacos-group/nacos-sdk-go/v2/clients"
-	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/bytedance/sonic"
+	"github.com/go-zookeeper/zk"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
@@ -23,9 +24,6 @@ import (
 
 type TunnelConfigLoader struct {
 	config *TunnelConfig
-
-	apolloClient agollo.Client
-	redisClient  redis.UniversalClient
 }
 
 func (c *TunnelConfigLoader) bindAllConfigEnv() {
@@ -51,6 +49,9 @@ func (c *TunnelConfigLoader) bindAllConfigEnv() {
 	_ = viper.BindEnv(utils.ConfigFromNacosEnvNamespaceId)
 	_ = viper.BindEnv(utils.ConfigFromNacosEnvDataId)
 	_ = viper.BindEnv(utils.ConfigFromNacosEnvGroup)
+	// Zookeeper
+	_ = viper.BindEnv(utils.ConfigFromZookeeperEnvHosts)
+	_ = viper.BindEnv(utils.ConfigFromZookeeperEnvConfigPath)
 }
 
 func (c *TunnelConfigLoader) IsConfigLoaded() bool {
@@ -80,6 +81,7 @@ func (c *TunnelConfigLoader) loadFromLocal(path string) {
 		os.Exit(1)
 	}
 	TunnelCfg = c.loadFile(data)
+	// TODO live reload
 }
 
 func (c *TunnelConfigLoader) loadFromApollo() {
@@ -89,7 +91,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_HOST is empty")
 		os.Exit(1)
 	}
-	apolloHost := apolloHostObj.(string)
+	apolloHost := cast.ToString(apolloHostObj)
 
 	// AppID
 	var apolloAppId string
@@ -98,7 +100,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		apolloAppId = utils.ServiceName
 		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_APP_ID is empty, use default AppID to instead")
 	} else {
-		apolloAppId = apolloAppIdObj.(string)
+		apolloAppId = cast.ToString(apolloAppIdObj)
 	}
 
 	// Namespace
@@ -108,7 +110,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		apolloNamespace = "application"
 		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_NAMESPACE is empty, use default NamespaceName to instead")
 	} else {
-		apolloNamespace = apolloNamespaceObj.(string)
+		apolloNamespace = cast.ToString(apolloNamespaceObj)
 	}
 
 	// Cluster key
@@ -118,7 +120,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		apolloClusterKey = "default"
 		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_CLUSTER_KEY is empty, use default NamespaceName to instead")
 	} else {
-		apolloClusterKey = apolloClusterKeyObj.(string)
+		apolloClusterKey = cast.ToString(apolloClusterKeyObj)
 	}
 
 	// Config Key
@@ -128,7 +130,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_CONFIG_KEY is empty")
 		os.Exit(1)
 	}
-	apolloConfigKey = apolloConfigKeyObj.(string)
+	apolloConfigKey = cast.ToString(apolloConfigKeyObj)
 
 	// apollo config
 	cfg := &config.AppConfig{
@@ -145,10 +147,9 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		logger.Logger.Fatal(utils.LogServiceName + "load Apollo config error,reason: " + err.Error())
 		return
 	}
-	c.apolloClient = client
 
 	// get config from apollo configuration
-	cache := c.apolloClient.GetConfigCache(apolloNamespace)
+	cache := client.GetConfigCache(apolloNamespace)
 	count := 0
 	cache.Range(func(key, value interface{}) bool {
 		count++
@@ -164,7 +165,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		TunnelCfg = c.loadFile([]byte(value.(string)))
 		logger.Logger.Info(utils.LogServiceName + "Load Apollo config is successful!")
 	}
-	// TODO 后续再实现实时更新的操作
+	// TODO live reload
 }
 
 func (c *TunnelConfigLoader) loadFromRedis() {
@@ -174,20 +175,20 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Redis config error, reason: REDIS_HOST is empty")
 		os.Exit(1)
 	}
-	redisHosts := redisHostObj.(string)
+	redisHosts := cast.ToString(redisHostObj)
 
 	// Redis Username (Redis 6.0+)
 	var redisUsername string
 	redisUsernameObj := viper.Get(utils.ConfigFromRedisEnvUsername)
 	if redisUsernameObj != nil {
-		redisUsername = redisUsernameObj.(string)
+		redisUsername = cast.ToString(redisUsernameObj)
 	}
 
 	// Redis Password
 	var redisPassword string
 	redisPasswordObj := viper.Get(utils.ConfigFromRedisEnvPassword)
 	if redisPasswordObj != nil {
-		redisPassword = redisPasswordObj.(string)
+		redisPassword = cast.ToString(redisPasswordObj)
 	}
 
 	// Redis DB Num
@@ -207,7 +208,7 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Redis config error, reason: REDIS_CONFIG_KEY is empty")
 		os.Exit(1)
 	}
-	redisConfigKey = redisConfigKeyObj.(string)
+	redisConfigKey = cast.ToString(redisConfigKeyObj)
 
 	// Redis Client
 	client := redis.NewUniversalClient(&redis.UniversalOptions{
@@ -220,16 +221,15 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 		logger.Logger.Error(utils.LogServiceName + "Failed to connect Redis! Reason for exception: " + pingErr.Error())
 		return
 	}
-	c.redisClient = client
 
-	rConfig, getErr := c.redisClient.Get(context.Background(), redisConfigKey).Result()
+	rConfig, getErr := client.Get(context.Background(), redisConfigKey).Result()
 	if getErr != nil {
 		logger.Logger.Fatal(utils.LogServiceName + "load Redis config error,reason: " + getErr.Error())
 		return
 	}
 	TunnelCfg = c.loadFile([]byte(rConfig))
 	logger.Logger.Info(utils.LogServiceName + "Load Redis config is successful!")
-	// TODO 后续再实现实时更新的操作
+	// TODO live reload
 }
 
 func (c *TunnelConfigLoader) loadFromNacos() {
@@ -296,6 +296,38 @@ func (c *TunnelConfigLoader) loadFromNacos() {
 	// TODO live reload
 }
 
+func (c *TunnelConfigLoader) loadFromZookeeper() {
+	// Zookeeper Hosts
+	zkHostsObj := viper.Get(utils.ConfigFromZookeeperEnvHosts)
+	if zkHostsObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load Zookeeper config error, reason: ZOOKEEPER_HOSTS is empty")
+		os.Exit(1)
+	}
+
+	conn, _, connErr := zk.Connect(strings.Split(cast.ToString(zkHostsObj.(string)), ","), time.Second)
+	if connErr != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "failed to create Zookeeper client, Reason for exception: " + connErr.Error())
+		return
+	}
+	defer conn.Close()
+
+	// ConfigPath
+	zkConfigPathObj := viper.Get(utils.ConfigFromZookeeperEnvConfigPath)
+	if zkConfigPathObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load Zookeeper config error, reason: ZOOKEEPER_CONFIG_PATH is empty")
+		os.Exit(1)
+	}
+
+	configData, _, getErr := conn.Get(cast.ToString(zkConfigPathObj))
+	if getErr != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "failed to get Zookeeper config, Reason for exception: " + getErr.Error())
+		return
+	}
+	TunnelCfg = c.loadFile(configData)
+	logger.Logger.Info(utils.LogServiceName + "Load Zookeeper config is successful!")
+	// TODO live reload
+}
+
 // Load load config api
 func (c *TunnelConfigLoader) Load() {
 	// bind viper setting
@@ -307,20 +339,22 @@ func (c *TunnelConfigLoader) Load() {
 		os.Exit(1)
 	}
 
-	switch loadSrcObj.(string) {
+	switch cast.ToString(loadSrcObj) {
 	case utils.ConfigFromLocalTagName:
 		localPathObj := viper.Get(utils.ConfigFromLocalPathEnvName)
 		if localPathObj == nil {
 			logger.Logger.Fatal(utils.LogServiceName + "config load error! LOCAL_PATH env is not set!")
 			os.Exit(1)
 		}
-		c.loadFromLocal(localPathObj.(string))
+		c.loadFromLocal(cast.ToString(localPathObj))
 	case utils.ConfigFromApolloTagName:
 		c.loadFromApollo()
 	case utils.ConfigFromRedisTagName:
 		c.loadFromRedis()
 	case utils.ConfigFromNacosTagName:
 		c.loadFromNacos()
+	case utils.ConfigFromZookeeperTagName:
+		c.loadFromZookeeper()
 	default:
 		logger.Logger.Fatal(utils.LogServiceName + "config load error! CONFIG_SRC env is unsupported!")
 		os.Exit(1)

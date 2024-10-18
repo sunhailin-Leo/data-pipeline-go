@@ -20,28 +20,31 @@ const (
 	AckModeInTransform int = 1
 	AckModeInSink      int = 2
 
-	ConfigFromLocalTagName  string = "local"
-	ConfigFromApolloTagName string = "apollo"
-	ConfigFromRedisTagName  string = "redis"
-	ConfigFromNacosTagName  string = "nacos"
+	ConfigFromLocalTagName     string = "local"
+	ConfigFromApolloTagName    string = "apollo"
+	ConfigFromRedisTagName     string = "redis"
+	ConfigFromNacosTagName     string = "nacos"
+	ConfigFromZookeeperTagName string = "zookeeper"
 
-	ConfigFromSourceName          string = "CONFIG_SRC"         // Required
-	ConfigFromLocalPathEnvName    string = "LOCAL_PATH"         // If CONFIG_SRC = local, then required
-	ConfigFromApolloEnvHost       string = "APOLLO_HOST"        // If CONFIG_SRC = apollo, then required
-	ConfigFromApolloEnvAppId      string = "APOLLO_APP_ID"      // optional
-	ConfigFromApolloEnvNamespace  string = "APOLLO_NAMESPACE"   // optional
-	ConfigFromApolloEnvClusterKey string = "APOLLO_CLUSTER_KEY" // optional
-	ConfigFromApolloEnvConfigKey  string = "APOLLO_CONFIG_KEY"  // If CONFIG_SRC = apollo, then required
-	ConfigFromRedisEnvHost        string = "REDIS_HOST"         // If CONFIG_SRC = redis, then required
-	ConfigFromRedisEnvUsername    string = "REDIS_USERNAME"     // optional
-	ConfigFromRedisEnvPassword    string = "REDIS_PASSWORD"     // optional
-	ConfigFromRedisEnvDBNum       string = "REDIS_DB"           // optional
-	ConfigFromRedisEnvConfigKey   string = "REDIS_CONFIG_KEY"   // If CONFIG_SRC = redis, then required
-	ConfigFromNacosEnvServerIP    string = "NACOS_IP"           // If CONFIG_SRC = nacos, then required
-	ConfigFromNacosEnvServerPort  string = "NACOS_PORT"         // If CONFIG_SRC = nacos, then required
-	ConfigFromNacosEnvNamespaceId string = "NACOS_NAMESPACE_ID" // optional
-	ConfigFromNacosEnvDataId      string = "NACOS_DATA_ID"      // If CONFIG_SRC = nacos, then required
-	ConfigFromNacosEnvGroup       string = "NACOS_GROUP"        // If CONFIG_SRC = nacos, then required
+	ConfigFromSourceName             string = "CONFIG_SRC"         // Required
+	ConfigFromLocalPathEnvName       string = "LOCAL_PATH"         // If CONFIG_SRC = local, then required
+	ConfigFromApolloEnvHost          string = "APOLLO_HOST"        // If CONFIG_SRC = apollo, then required
+	ConfigFromApolloEnvAppId         string = "APOLLO_APP_ID"      // optional
+	ConfigFromApolloEnvNamespace     string = "APOLLO_NAMESPACE"   // optional
+	ConfigFromApolloEnvClusterKey    string = "APOLLO_CLUSTER_KEY" // optional
+	ConfigFromApolloEnvConfigKey     string = "APOLLO_CONFIG_KEY"  // If CONFIG_SRC = apollo, then required
+	ConfigFromRedisEnvHost           string = "REDIS_HOST"         // If CONFIG_SRC = redis, then required
+	ConfigFromRedisEnvUsername       string = "REDIS_USERNAME"     // optional
+	ConfigFromRedisEnvPassword       string = "REDIS_PASSWORD"     // optional
+	ConfigFromRedisEnvDBNum          string = "REDIS_DB"           // optional
+	ConfigFromRedisEnvConfigKey      string = "REDIS_CONFIG_KEY"   // If CONFIG_SRC = redis, then required
+	ConfigFromNacosEnvServerIP       string = "NACOS_IP"           // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvServerPort     string = "NACOS_PORT"         // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvNamespaceId    string = "NACOS_NAMESPACE_ID" // optional
+	ConfigFromNacosEnvDataId         string = "NACOS_DATA_ID"      // If CONFIG_SRC = nacos, then required
+	ConfigFromNacosEnvGroup          string = "NACOS_GROUP"        // If CONFIG_SRC = nacos, then required
+	ConfigFromZookeeperEnvHosts      string = "ZOOKEEPER_HOSTS"
+	ConfigFromZookeeperEnvConfigPath string = "ZOOKEEPER_CONFIG_PATH"
 
 	SourceKafkaTagName       string = "Kafka"
 	SourceRocketMQTagName    string = "RocketMQ"

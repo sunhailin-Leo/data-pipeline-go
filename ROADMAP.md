@@ -57,6 +57,6 @@
     - [X] Apollo
     - [X] Redis
     - [X] Nacos
-    - [ ] Zookeeper
+    - [X] Zookeeper
 - [X] Prometheus
 - [X] pprof
