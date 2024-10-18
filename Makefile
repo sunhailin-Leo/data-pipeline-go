@@ -75,7 +75,7 @@ test:
 .PHONY: pre-ci-build
 pre-ci-build:
 	@$(CHCP_CMD)
-	export GOPROXY=https://maven.jtexpress.com.cn/nexus3/repository/go-proxy GOFLAGS="-buildvcs=false"
+	export GOFLAGS="-buildvcs=false"
 
 .PHONY: build
 build:
