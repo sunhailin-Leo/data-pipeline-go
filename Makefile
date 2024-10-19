@@ -30,9 +30,6 @@ endif
 # Define golangci-lint
 GOLANGCI_LINT=golangci-lint
 GOLANGCI_LINT_VERBOSE=--verbose
-GOLANGCI_LINT_ENABLE=--enable=nolintlint,bodyclose,gocritic
-GOLANGCI_LINT_EXCLUDE=--exclude=SA1029
-GOLANGCI_LINT_OTHER=--max-same-issues 100 --max-issues-per-linter 100
 
 # Define nilaway
 NILAWAY=nilaway
@@ -59,7 +56,7 @@ lint-all: lint nilaway
 .PHONY: lint
 lint:
 	@$(CHCP_CMD)
-	-${GOLANGCI_LINT} run ${GOLANGCI_LINT_VERBOSE} ${GOLANGCI_LINT_ENABLE} ${GOLANGCI_LINT_EXCLUDE} ${GOLANGCI_LINT_OTHER}
+	-${GOLANGCI_LINT} run ${GOLANGCI_LINT_VERBOSE}
 
 .IGNORE: nilaway
 .PHONY: nilaway

@@ -31,15 +31,45 @@ func processBySink(resultData map[string][]any, streamConfig *config.StreamConfi
 				}
 				resultData[sinkName] = []any{[]byte(row)}
 			}
+		case utils.SinkRocketMQTagName:
+			switch sinkCfg.RocketMQ.MessageMode {
+			case utils.TransformJsonMode:
+				resultData[sinkName] = []any{MapToJson(utils.StringSliceToMap(specialProcessKeys, result))}
+			case utils.TransformRowMode:
+				var row string
+				for _, item := range result {
+					row += CastTypes(item, "toString").(string)
+				}
+				resultData[sinkName] = []any{[]byte(row)}
+			}
+		case utils.SinkRabbitMQTagName:
+			switch sinkCfg.RabbitMQ.MessageMode {
+			case utils.TransformJsonMode:
+				resultData[sinkName] = []any{MapToJson(utils.StringSliceToMap(specialProcessKeys, result))}
+			case utils.TransformRowMode:
+				var row string
+				for _, item := range result {
+					row += CastTypes(item, "toString").(string)
+				}
+				resultData[sinkName] = []any{[]byte(row)}
+			}
+		case utils.SinkPulsarTagName:
+			switch sinkCfg.Pulsar.MessageMode {
+			case utils.TransformJsonMode:
+				resultData[sinkName] = []any{MapToJson(utils.StringSliceToMap(specialProcessKeys, result))}
+			case utils.TransformRowMode:
+				var row string
+				for _, item := range result {
+					row += CastTypes(item, "toString").(string)
+				}
+				resultData[sinkName] = []any{[]byte(row)}
+			}
 		}
 	}
 }
 
 // JsonMode JSON mode
-func JsonMode(
-	beforeConvertData *models.TransformBeforeConvert,
-	runningCfg []config.TransformSchema,
-	streamConfig *config.StreamConfig) *models.TransformAfterConvert {
+func JsonMode(beforeConvertData *models.TransformBeforeConvert, runningCfg []config.TransformSchema, streamConfig *config.StreamConfig) *models.TransformAfterConvert {
 	// init
 	specialProcessKeys := make([]string, 0)
 	resultData := make(map[string][]any)

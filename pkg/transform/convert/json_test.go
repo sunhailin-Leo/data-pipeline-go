@@ -4,9 +4,42 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 )
+
+func TestProcessBySink(t *testing.T) {
+	type testCaseUnit struct {
+		inputData   map[string][]any
+		config      *config.StreamConfig
+		specialKeys []string
+		expected    any
+	}
+
+	testUnits := []testCaseUnit{
+		{
+			inputData: map[string][]any{"sink1": {1, 2, 3}},
+			config: &config.StreamConfig{
+				Sink: []*config.SinkConfig{
+					{
+						Type:     "HTTP",
+						SinkName: "sink1",
+						HTTP:     config.HTTPSinkConfig{ContentType: "application/json"},
+					},
+				},
+			},
+			specialKeys: []string{"key1", "key2", "key3"},
+			expected:    `{"key1":1,"key2":2,"key3":3}`,
+		},
+	}
+
+	for _, testUnit := range testUnits {
+		processBySink(testUnit.inputData, testUnit.config, testUnit.specialKeys)
+		assert.Equal(t, testUnit.expected, string(testUnit.inputData["sink1"][0].([]byte)))
+	}
+}
 
 func TestJsonMode(t *testing.T) {
 	t.Helper()
