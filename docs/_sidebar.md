@@ -5,9 +5,9 @@
   * [Source](zh/source)
     * [Kafka](zh/source/Kafka)
     * [Prometheus](zh/source/Prometheus)
-    * [Pulsar](zh/source/Prometheus)
+    * [Pulsar](zh/source/Pulsar.md)
     * [RabbitMQ](zh/source/RabbitMQ)
     * [Redis](zh/source/Redis)
-    * [RocketMQ](zh/source/RabbitMQ)
-  * [transform]
-  * [Sink]
+    * [RocketMQ](zh/source/RocketMQ.md)
+  * [Transform](zh/transform.md)
+  * [Sink](zh/sink.md)
