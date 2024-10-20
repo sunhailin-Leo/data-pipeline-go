@@ -1,4 +1,4 @@
-<h1 align="center">data-pipeline-go</h1>
+<h1 style="text-align: center;">data-pipeline-go</h1>
 
 ---
 
