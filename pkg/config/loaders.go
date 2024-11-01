@@ -16,6 +16,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
+	"github.com/valyala/fasthttp"
 	"golang.org/x/exp/mmap"
 
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
@@ -328,6 +329,72 @@ func (c *TunnelConfigLoader) loadFromZookeeper() {
 	// TODO live reload
 }
 
+func (c *TunnelConfigLoader) loadFromHTTP() {
+	httpHostsObj := viper.Get(utils.ConfigFromHTTPEnvHosts)
+	if httpHostsObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load HTTP config error, reason: HTTP_HOSTS is empty")
+		os.Exit(1)
+	}
+
+	httpUriObj := viper.Get(utils.ConfigFromHTTPEnvConfigURI)
+	if httpUriObj == nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load HTTP config error, reason: HTTP_CONFIG_URI is empty")
+		os.Exit(1)
+	}
+
+	// init client, request and response
+	client := &fasthttp.Client{}
+	clientReq := fasthttp.AcquireRequest()
+	clientReq.SetRequestURI(cast.ToString(httpHostsObj) + cast.ToString(httpUriObj))
+	clientReq.Header.SetContentType("application/json")
+	clientReq.Header.SetMethod(fasthttp.MethodGet)
+	clientResp := fasthttp.AcquireResponse()
+	// do request
+	if err := client.Do(clientReq, clientResp); err != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "failed to load HTTP config, Reason for exception: " + err.Error())
+		os.Exit(1)
+	}
+
+	// set config
+	TunnelCfg = c.loadFile(clientResp.Body())
+	logger.Logger.Info(utils.LogServiceName + "Load HTTP config is successful!")
+
+	// release
+	fasthttp.ReleaseRequest(clientReq)
+	fasthttp.ReleaseResponse(clientResp)
+
+	// heart beat
+	httpHeartBeatUriObj := viper.Get(utils.ConfigFromHTTPEnvHeartBeatURI)
+	if httpHeartBeatUriObj != nil {
+		logger.Logger.Fatal(utils.LogServiceName + "Load HTTP config error, reason: HTTP_HEARTBEAT_URI is empty")
+		os.Exit(1)
+	} else {
+		httpHeartBeatIntervalSecsObj := viper.Get(utils.ConfigFromHTTPEnvHeartBeatIntervalSecs)
+		if httpHeartBeatIntervalSecsObj == nil {
+			// default interval 15 secs
+			httpHeartBeatIntervalSecsObj = 15
+		}
+
+		// heart beat
+		go func(c *fasthttp.Client) {
+			for {
+				heartBeatReq := fasthttp.AcquireRequest()
+				heartBeatReq.SetRequestURI(cast.ToString(httpHostsObj) + cast.ToString(httpHeartBeatUriObj))
+				heartBeatReq.Header.SetMethod(fasthttp.MethodGet)
+
+				if heartBeatErr := c.Do(heartBeatReq, nil); heartBeatErr != nil {
+					logger.Logger.Error(utils.LogServiceName + "failed to keep heartbeat, Reason for exception: " + heartBeatErr.Error())
+					break
+				}
+
+				time.Sleep(time.Duration(cast.ToInt(httpHeartBeatIntervalSecsObj)) * time.Second)
+			}
+		}(client)
+	}
+
+	// TODO live reload
+}
+
 // Load load config api
 func (c *TunnelConfigLoader) Load() {
 	// bind viper setting
@@ -355,6 +422,8 @@ func (c *TunnelConfigLoader) Load() {
 		c.loadFromNacos()
 	case utils.ConfigFromZookeeperTagName:
 		c.loadFromZookeeper()
+	case utils.ConfigFromHTTPTagName:
+		c.loadFromHTTP()
 	default:
 		logger.Logger.Fatal(utils.LogServiceName + "config load error! CONFIG_SRC env is unsupported!")
 		os.Exit(1)

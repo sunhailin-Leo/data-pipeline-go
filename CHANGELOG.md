@@ -1,3 +1,6 @@
+* 2024-11-01 v0.2.3
+  * Supported load config from HTTP-Get
+
 * 2024-10-18 v0.2.2
   * Supported load config from Zookeeper
 
