@@ -58,5 +58,6 @@
     - [X] Redis
     - [X] Nacos
     - [X] Zookeeper
+    - [X] HTTP-Get
 - [X] Prometheus
 - [X] pprof
