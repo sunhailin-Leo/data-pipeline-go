@@ -35,7 +35,7 @@ type Stream interface {
 	GetTransform(
 		inputChan chan *models.SourceOutput,
 		outputChanMap map[string]chan *models.TransformOutput,
-		streamConfig *config.StreamConfig) transform.Transform
+		streamConfig *config.StreamConfig) *transform.Handler
 
 	GetSink(streamConfig *config.StreamConfig) map[string]chan *models.TransformOutput
 

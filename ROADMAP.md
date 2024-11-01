@@ -36,11 +36,10 @@
         - [X] Pub/Sub
             - [X] Publish
     - [X] PostgresSQL
-    - [ ] Elasticsearch 7/8
+    - [X] Elasticsearch 7/8
     - [X] LocalFile
         - [X] text(like txt)
         - [X] csv
-        - [ ] parquet (temporary not support)
     - [X] Pulsar
     - [X] RabbitMQ
     - [X] RocketMQ
@@ -51,11 +50,13 @@
     - [X] K-V Expand
     - [X] K-V Filter
     - [X] K-V Strict Mode
+    - [X] Json Mode
+    - [X] JsonPath Mode
 - [X] config center
     - [X] Local
     - [X] Apollo
     - [X] Redis
-    - [ ] Nacos
-    - [ ] Zookeeper
+    - [X] Nacos
+    - [X] Zookeeper
 - [X] Prometheus
 - [X] pprof

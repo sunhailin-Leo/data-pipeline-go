@@ -5,10 +5,6 @@ import (
 	"encoding/csv"
 	"os"
 
-	"github.com/xitongsys/parquet-go-source/local"
-	"github.com/xitongsys/parquet-go/source"
-	"github.com/xitongsys/parquet-go/writer"
-
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
@@ -22,8 +18,6 @@ type LocalFileSinkHandler struct {
 	file             *os.File
 	csvWriter        *csv.Writer
 	textWriter       *bufio.Writer
-	parquetFp        source.ParquetFile
-	parquetWriter    *writer.ParquetWriter
 }
 
 func (l *LocalFileSinkHandler) SinkName() string {
@@ -39,12 +33,6 @@ func (l *LocalFileSinkHandler) WriteData() {
 			if l.file == nil {
 				logger.Logger.Error(utils.LogServiceName +
 					"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]File closed or not open!")
-				return
-			}
-		case utils.LocalFileParquetFormatType:
-			if l.parquetFp == nil {
-				logger.Logger.Error(utils.LogServiceName +
-					"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]parquet file is closed or not open!")
 				return
 			}
 		default:
@@ -88,16 +76,6 @@ func (l *LocalFileSinkHandler) WriteData() {
 				}
 			}
 			l.Metrics.OnSinkOutputSuccess(l.StreamName, l.SinkAliasName)
-		case utils.LocalFileParquetFormatType:
-			// TODO 暂时无法写入
-			for _, row := range data.Data {
-				if writeErr := l.parquetWriter.Write(row); writeErr != nil {
-					logger.Logger.Error(utils.LogServiceName +
-						"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]parquet file write failed! Reason for error: " + writeErr.Error())
-					return
-				}
-			}
-			l.Metrics.OnSinkOutputSuccess(l.StreamName, l.SinkAliasName)
 		default:
 			logger.Logger.Error(utils.LogServiceName + "[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Unknown file format!")
 			return
@@ -127,23 +105,6 @@ func (l *LocalFileSinkHandler) InitSink() {
 		}
 		l.file = file
 		l.textWriter = bufio.NewWriter(file)
-	case utils.LocalFileParquetFormatType:
-		fw, newFwErr := local.NewLocalFileWriter(l.sinkLocalFileCfg.FileName + ".parquet")
-		if newFwErr != nil {
-			logger.Logger.Error(utils.LogServiceName +
-				"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Failed to create parquet file! Reason for error: " + newFwErr.Error())
-			return
-		}
-
-		pw, newPwErr := writer.NewParquetWriter(fw, nil, 1)
-		if newPwErr != nil {
-			logger.Logger.Error(utils.LogServiceName +
-				"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Failed to create parquet writer! Reason for error: " + newPwErr.Error())
-			return
-		}
-
-		l.parquetFp = fw
-		l.parquetWriter = pw
 	default:
 		logger.Logger.Error(utils.LogServiceName + "[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Unknown file format!")
 		return
@@ -154,12 +115,6 @@ func (l *LocalFileSinkHandler) InitSink() {
 func (l *LocalFileSinkHandler) CloseSink() {
 	if l.file != nil {
 		_ = l.file.Close()
-	}
-	if l.parquetFp != nil {
-		_ = l.parquetFp.Close()
-	}
-	if l.parquetWriter != nil {
-		_ = l.parquetWriter.WriteStop()
 	}
 	l.Close()
 }

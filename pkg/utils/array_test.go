@@ -68,3 +68,34 @@ func TestStringSliceToMap(t *testing.T) {
 		}
 	}
 }
+
+func TestStringSliceToInterface(t *testing.T) {
+	tests := []struct {
+		input    []string
+		expected []interface{}
+	}{
+		{
+			input:    []string{"a", "b", "c"},
+			expected: []interface{}{"a", "b", "c"},
+		},
+		{
+			input:    []string{},
+			expected: []interface{}{},
+		},
+		{
+			input:    []string{"1", "2", "3"},
+			expected: []interface{}{"1", "2", "3"},
+		},
+		{
+			input:    []string{"hello", "world"},
+			expected: []interface{}{"hello", "world"},
+		},
+	}
+
+	for _, test := range tests {
+		result := StringSliceToInterface(test.input)
+		if !reflect.DeepEqual(result, test.expected) {
+			t.Errorf("For input %v, expected %v, but got %v", test.input, test.expected, result)
+		}
+	}
+}

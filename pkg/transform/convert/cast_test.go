@@ -4,6 +4,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 )
 
@@ -25,7 +28,7 @@ func TestGenerateConvertResultData(t *testing.T) {
 			SinkNames:     "Clickhouse-1",
 			AfterCaseData: 123,
 			Expected: map[string][]any{
-				"Clickhouse-1": []any{123},
+				"Clickhouse-1": {123},
 			},
 		},
 		{
@@ -45,6 +48,38 @@ func TestGenerateConvertResultData(t *testing.T) {
 			t.Fatalf("TestGenerateConvertResultData failed. Expected: %v, actual: %v", unit.Expected, actual)
 		}
 	}
+}
+
+func TestJsonPathToMap(t *testing.T) {
+	initLogger()
+
+	// normal
+	data := []byte(`{"key1": "value1", "key2": "value2"}`)
+	paths := []config.TransformJsonPath{
+		{SrcField: "", Path: "key1", DestField: "destKey1"},
+		{SrcField: "", Path: "key2", DestField: "destKey2"},
+	}
+
+	result := JsonPathToMap(data, paths)
+	assert.Equal(t, map[string]any{"destKey1": "value1", "destKey2": "value2"}, result)
+
+	// path error
+	data = []byte(`{"key1": "value1", "key2": "value2"}`)
+	paths = []config.TransformJsonPath{
+		{SrcField: "", Path: "invalidPath", DestField: "destKey"},
+	}
+
+	result = JsonPathToMap(data, paths)
+	assert.Equal(t, map[string]any{}, result)
+
+	// data error
+	data = []byte(`invalidData`)
+	paths = []config.TransformJsonPath{
+		{SrcField: "", Path: "key1", DestField: "destKey1"},
+	}
+
+	result = JsonPathToMap(data, paths)
+	assert.Equal(t, map[string]any{}, result)
 }
 
 func TestJsonToMap(t *testing.T) {
@@ -137,4 +172,60 @@ func TestCastTypes(t *testing.T) {
 			t.Fatalf("TestCastTypes failed. ConvertorName: %s, Expected: %v, actual: %v", unit.ConvertorName, unit.Expected, actual)
 		}
 	}
+}
+
+func TestCastTypesDefaultValue(t *testing.T) {
+	// empty string
+	result := CastTypesDefaultValue("")
+	assert.Nil(t, result)
+
+	// test "toBool"
+	result = CastTypesDefaultValue("toBool")
+	assert.Equal(t, false, result)
+
+	// test "toFloat64" and "toFloat32"
+	result = CastTypesDefaultValue("toFloat64")
+	assert.Equal(t, 0.0, result)
+	result = CastTypesDefaultValue("toFloat32")
+	assert.Equal(t, 0.0, result)
+
+	// test other int types
+	result = CastTypesDefaultValue("toInt64")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toInt32")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toInt16")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toInt8")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toInt")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toUint")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toUint64")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toUint32")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toUint16")
+	assert.Equal(t, 0, result)
+	result = CastTypesDefaultValue("toUint8")
+	assert.Equal(t, 0, result)
+
+	// test "toString"
+	result = CastTypesDefaultValue("toString")
+	assert.Equal(t, "", result)
+
+	// test other
+	result = CastTypesDefaultValue("other")
+	assert.Nil(t, result)
+}
+
+func TestCastFunctionNameToFunctionResult(t *testing.T) {
+	// Test scenario 1: The input is "$.UUID()", and the expected return is the simulated UUID
+	result1 := CastFunctionNameToFunctionResult("$.UUID()")
+	assert.NotEqual(t, nil, result1)
+
+	// Test scenario 2: The input is something else, and the expected return is the input value itself
+	result2 := CastFunctionNameToFunctionResult("other-value")
+	assert.Equal(t, "other-value", result2)
 }

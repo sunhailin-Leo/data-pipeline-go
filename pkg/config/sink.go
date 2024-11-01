@@ -59,18 +59,18 @@ type RedisSinkConfig struct {
 // LocalFileSinkConfig LocalFile Sink config
 type LocalFileSinkConfig struct {
 	FileName       string `json:"file_name"`
-	FileFormatType string `json:"file_format_type"` // file format type: text, csv, parquet(temporary not support)
+	FileFormatType string `json:"file_format_type"` // file format type: text, csv
 	RowDelimiter   string `json:"row_delimiter"`    // only file_format_type = text is affect
 }
 
 // PostgresSQLSinkConfig PostgresSQL Sink config
 type PostgresSQLSinkConfig struct {
-	Address   string `json:"address"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Database  string `json:"database"`
-	TableName string `json:"table_name"`
-	BulkSize  int    `json:"bulk_size"`
+	Address   string `json:"address"`    // PostgresSQL address
+	Username  string `json:"username"`   // PostgresSQL username
+	Password  string `json:"password"`   // PostgresSQL password
+	Database  string `json:"database"`   // PostgresSQL database
+	TableName string `json:"table_name"` // PostgresSQL table name
+	BulkSize  int    `json:"bulk_size"`  // Bulk size
 }
 
 // RocketMQSinkConfig RocketMQ Sink config
@@ -82,37 +82,49 @@ type RocketMQSinkConfig struct {
 
 // RabbitMQSinkConfig RabbitMQ Sink config
 type RabbitMQSinkConfig struct {
-	Address    string `json:"address"`
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	VHost      string `json:"v_host"`
-	Queue      string `json:"queue"`
-	Exchange   string `json:"exchange"`
-	RoutingKey string `json:"routing_key"`
+	Address     string `json:"address"`      // RabbitMQ address
+	Username    string `json:"username"`     // RabbitMQ username
+	Password    string `json:"password"`     // RabbitMQ password
+	VHost       string `json:"v_host"`       // RabbitMQ vhost
+	Queue       string `json:"queue"`        // RabbitMQ queue
+	Exchange    string `json:"exchange"`     // RabbitMQ exchange
+	RoutingKey  string `json:"routing_key"`  // RabbitMQ routing key
+	MessageMode string `json:"message_mode"` // message mode: json, text
 }
 
 // OracleSinkConfig Oracle Sink config
 type OracleSinkConfig struct {
-	Address   string `json:"address"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Database  string `json:"database"`
-	TableName string `json:"table_name"`
-	BulkSize  int    `json:"bulk_size"`
+	Address   string `json:"address"`    // Oracle address
+	Username  string `json:"username"`   // Oracle username
+	Password  string `json:"password"`   // Oracle password
+	Database  string `json:"database"`   // Oracle database
+	TableName string `json:"table_name"` // Oracle table name
+	BulkSize  int    `json:"bulk_size"`  // Bulk size
 }
 
 // MySQLSinkConfig MySQL Sink config
 type MySQLSinkConfig struct {
-	Address   string `json:"address"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Database  string `json:"database"`
-	TableName string `json:"table_name"`
-	BulkSize  int    `json:"bulk_size"`
+	Address   string `json:"address"`    // MySQL address
+	Username  string `json:"username"`   // MySQL username
+	Password  string `json:"password"`   // MySQL password
+	Database  string `json:"database"`   // MySQL database
+	TableName string `json:"table_name"` // MySQL table name
+	BulkSize  int    `json:"bulk_size"`  // Bulk size
 }
 
 // PulsarSinkConfig Pulsar Sink config
 type PulsarSinkConfig struct {
-	Address string `json:"address"` // Pulsar host
-	Topic   string `json:"topic"`   // Pulsar Topic
+	Address     string `json:"address"`      // Pulsar host
+	Topic       string `json:"topic"`        // Pulsar Topic
+	MessageMode string `json:"message_mode"` // message mode: json, text
+}
+
+// ElasticsearchSinkConfig Elasticsearch Sink config
+type ElasticsearchSinkConfig struct {
+	Address   string `json:"address"`     // Elasticsearch address
+	Username  string `json:"username"`    // Elasticsearch username
+	Password  string `json:"password"`    // Elasticsearch password
+	IndexName string `json:"index_name"`  // Elasticsearch index name
+	DocIdName string `json:"doc_id_name"` // Elasticsearch document id name (will take it from transform data)
+	Version   string `json:"version"`     // Only use 7.X or 8.X
 }
