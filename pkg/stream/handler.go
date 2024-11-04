@@ -55,10 +55,9 @@ func (s *Handler) GetSource(streamConfig *config.StreamConfig) map[string]chan *
 
 // GetTransform init transform
 func (s *Handler) GetTransform(inputChan chan *models.SourceOutput, outputChanMap map[string]chan *models.TransformOutput, streamConfig *config.StreamConfig) transform.Transform {
-	return transform.NewTransformHandler(inputChan, outputChanMap).
-		SetMetricsHooks(s.metrics).
-		SetStreamConfig(streamConfig).
-		InitTransform(streamConfig.Transform, streamConfig.ChannelSize)
+	t := transform.NewTransformHandler(inputChan, outputChanMap)
+	t.SetMetricsHooks(s.metrics).SetStreamConfig(streamConfig).InitTransform(streamConfig.Transform, streamConfig.ChannelSize)
+	return t
 }
 
 // GetSink init sink
@@ -71,6 +70,7 @@ func (s *Handler) GetSink(streamConfig *config.StreamConfig) map[string]chan *mo
 			StreamName:    streamConfig.Name,
 			SinkAliasName: sinkConfig.SinkName,
 			ChanSize:      streamConfig.ChannelSize,
+			StreamConfig:  streamConfig,
 		}
 
 		sinker := NewSink(sinkConfig.Type, baseSink, sinkConfig)

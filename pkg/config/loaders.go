@@ -2,12 +2,14 @@ package config
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/apolloconfig/agollo/v4"
 	"github.com/apolloconfig/agollo/v4/env/config"
+	vd "github.com/bytedance/go-tagexpr/v2/validator"
 	"github.com/bytedance/sonic"
 	"github.com/go-zookeeper/zk"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
@@ -53,10 +55,32 @@ func (c *TunnelConfigLoader) bindAllConfigEnv() {
 	// Zookeeper
 	_ = viper.BindEnv(utils.ConfigFromZookeeperEnvHosts)
 	_ = viper.BindEnv(utils.ConfigFromZookeeperEnvConfigPath)
+	// HTTP
+	_ = viper.BindEnv(utils.ConfigFromHTTPEnvHosts)
+	_ = viper.BindEnv(utils.ConfigFromHTTPEnvConfigURI)
+	_ = viper.BindEnv(utils.ConfigFromHTTPEnvHeartBeatURI)
+	_ = viper.BindEnv(utils.ConfigFromHTTPEnvHeartBeatIntervalSecs)
 }
 
 func (c *TunnelConfigLoader) IsConfigLoaded() bool {
 	return c.config != nil
+}
+
+func (c *TunnelConfigLoader) validateConfig(cfg *TunnelConfig) error {
+	// vd check
+	if validateErr := vd.Validate(cfg); validateErr != nil {
+		return validateErr
+	}
+
+	// duplicate check
+	streamNameMap := make(map[string]struct{})
+	for _, stream := range cfg.Streams {
+		_, ok := streamNameMap[stream.Name]
+		if ok {
+			return errors.New("stream name " + stream.Name + " is duplicated")
+		}
+	}
+	return nil
 }
 
 func (c *TunnelConfigLoader) loadFile(data []byte) *TunnelConfig {
@@ -65,6 +89,12 @@ func (c *TunnelConfigLoader) loadFile(data []byte) *TunnelConfig {
 		logger.Logger.Fatal("Project configuration file parsing failed! Error reason: " + err.Error())
 		os.Exit(1)
 	}
+
+	if validateErr := c.validateConfig(&defaultConfig); validateErr != nil {
+		logger.Logger.Fatal("Project configuration file validate failed! Error reason: " + validateErr.Error())
+		os.Exit(1)
+	}
+
 	return &defaultConfig
 }
 
