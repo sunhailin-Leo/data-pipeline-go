@@ -12,10 +12,30 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: '',
-      repo: '',
+      // 入口文件改为 ../README.md
+      homepage: 'zh/README.md',
+      name: 'data-pipeline-go',
+      repo: 'https://github.com/sunhailin-Leo/data-pipeline-go',
+      autoHeader: true,
+      auto2top: true,
       loadSidebar: true,
-      subMaxLevel: 1,
+      loadNavbar: true,
+      relativePath: true,
+      plugins: [
+        function (hook) {
+          const footer = [
+            '<hr/>',
+            '<footer>',
+            '<span><a href="https://github.com/sunhailin-Leo/data-pipeline-go">data-pipeline-go</a> &copy;2017 - 2023.</span>',
+            '<span>Powered By <a href="https://github.com/QingWei-Li/docsify" target="_blank">docsify</a>.</span>',
+            '</footer>'
+          ].join('');
+
+          hook.afterEach(function (html) {
+            return html + footer
+          })
+        }
+      ]
     }
   </script>
   <!-- Docsify v4 -->

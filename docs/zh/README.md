@@ -1,15 +1,13 @@
 <h1 style="text-align: center;">data-pipeline-go</h1>
 
----
 
 ## 项目介绍
-基于 Golang 实现一个类似 SeaTunnel 的数据同步工具, 主要是为了**简便易用**
-  * 数据源多样：兼容基本常用的数据源。
-  * 管理和维护简单：基于容器化部署或二进制部署，部署维护简便
-  * 资源利用率高/高性能：Golang 天然资源利用率高 + Channel 实现的高性能同步数据流
+* 基于 Golang 实现一个类似 SeaTunnel 的数据同步工具, 主要是为了简便易用
+* **文档在 docs 目录下** 【To be continued!】
+* **示例在 example 目录下** 【To be continued!】
 
 ### 项目架构
-![framework.jpg](docs/static/framework.jpg)
+![framework.jpg](../static/framework.jpg)
 
 ## 静态检查
 
@@ -25,12 +23,21 @@
   * 安装: `go install go.uber.org/nilaway/cmd/nilaway@latest`
   * 检查: `nilaway ./...`
 
+## 说明文档启动
+```shell
+# 安装 docsify
+npm i docsify-cli -g 
+#查看版本
+docsify -v  
+# 启动
+docsify serve docs
+```
 
 ## 快速启动
 
 ### 添加作业配置文件来定义作业
 
-* 配置文件示例: [example/kafka_to_http.json](example/kafka_to_http.json)
+* 配置文件示例: [example/kafka_to_http.json](../../example/kafka_to_http.json)
 ```json
 {
     "streams": [
@@ -81,7 +88,7 @@
     ]
 }
 ```
-* 配置文件说明: 
+* 配置文件说明:
   * 配置文件的格式为 json 格式
   * 配置文件的 `streams` 内容为一个数组, 数组中的每个元素为一个作业
   * `source` 为输入源
@@ -114,19 +121,18 @@ go build -o data-pipeline-go ./main.go
 
 ### 运行效果
 #### 随机写入 10 条数据到 kafka 中
-![write_kafka.png](docs/static/write_kafka.png)
+![write_kafka.png](../static/write_kafka.png)
 
 #### data-pipeline-go 运行结果
-![dpg_result.png](docs/static/dpg_result.png)
+![dpg_result.png](../static/dpg_result.png)
 
 #### HTTP 接口 打印请求数据
-![http_resp.png](docs/static/http_resp.png)
-
+![http_resp.png](../static/http_resp.png)
 
 ## 实现模块
 
-[ROADMAP](ROADMAP.md)
+[ROADMAP](../../ROADMAP.md)
 
 ## 版本日志
 
-[CHANGELOG](CHANGELOG.md)
+[CHANGELOG](../../CHANGELOG.md)
