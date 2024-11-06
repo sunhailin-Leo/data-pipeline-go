@@ -9,7 +9,7 @@
   * 资源利用率高/高性能：Golang 天然资源利用率高 + Channel 实现的高性能同步数据流
 
 ### 项目架构
-![framework.jpg](./docs/framework.jpg)
+![framework.jpg](docs/static/framework.jpg)
 
 ## 静态检查
 
@@ -114,13 +114,13 @@ go build -o data-pipeline-go ./main.go
 
 ### 运行效果
 #### 随机写入 10 条数据到 kafka 中
-![write_kafka.png](docs/write_kafka.png)
+![write_kafka.png](docs/static/write_kafka.png)
 
 #### data-pipeline-go 运行结果
-![dpg_result.png](docs/dpg_result.png)
+![dpg_result.png](docs/static/dpg_result.png)
 
 #### HTTP 接口 打印请求数据
-![http_resp.png](docs/http_resp.png)
+![http_resp.png](docs/static/http_resp.png)
 
 
 ## 实现模块

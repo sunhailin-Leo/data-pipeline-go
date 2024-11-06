@@ -7,7 +7,7 @@
 * **示例在 example 目录下** 【To be continued!】
 
 ### 项目架构
-![framework.jpg](framework.jpg)
+![framework.jpg](../static/framework.jpg)
 
 ## 静态检查
 
@@ -37,7 +37,7 @@ docsify serve docs
 
 ### 添加作业配置文件来定义作业
 
-* 配置文件示例: [example/kafka_to_http.json](../example/kafka_to_http.json)
+* 配置文件示例: [example/kafka_to_http.json](../../example/kafka_to_http.json)
 ```json
 {
     "streams": [
@@ -121,18 +121,18 @@ go build -o data-pipeline-go ./main.go
 
 ### 运行效果
 #### 随机写入 10 条数据到 kafka 中
-![write_kafka.png](write_kafka.png)
+![write_kafka.png](../static/write_kafka.png)
 
 #### data-pipeline-go 运行结果
-![dpg_result.png](dpg_result.png)
+![dpg_result.png](../static/dpg_result.png)
 
 #### HTTP 接口 打印请求数据
-![http_resp.png](http_resp.png)
+![http_resp.png](../static/http_resp.png)
 
 ## 实现模块
 
-[ROADMAP](../ROADMAP.md)
+[ROADMAP](../../ROADMAP.md)
 
 ## 版本日志
 
-[CHANGELOG](../CHANGELOG.md)
+[CHANGELOG](../../CHANGELOG.md)
