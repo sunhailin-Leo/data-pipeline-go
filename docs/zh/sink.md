@@ -11,38 +11,38 @@ Type：表示 Sink 的类型，例如数据库、消息队列、文件存储等�
 SinkName：标识 Sink 的名称，用于区分不同的 Sink 实例，便于管理和监控。
 
 ## Sink 类型支持
-* [ClickHouse](./sink/Clickhouse.md)
+* [ClickHouse](./sink/clickhouse)
   * 用于将数据写入 ClickHouse 数据库，适合高效的数据分析。
 
-* [HTTP](./sink/HTTP.md) 
+* [HTTP](./sink/http) 
   * 通过 HTTP 请求发送数据到指定的 REST API 端点。
 
-* [Kafka](./sink/Kafka.md) 
+* [Kafka](./sink/kafka) 
   * 发布数据到 Kafka 消息队列，支持高吞吐量的数据流处理。
 
-* [Redis](./sink/Redis.md) 
+* [Redis](./sink/redis) 
   * 将数据存储到 Redis，适合快速的数据访问和缓存。
 
-* [LocalFile](./sink/LocalFile.md)
+* [LocalFile](./sink/local_file)
   * 将数据写入本地文件系统，便于日志记录和备份。
 
-* [PostgresSQL](./sink/PostgresSQL.md) 
+* [PostgresSQL](./sink/postgressql) 
   * 将数据存储到 PostgresSQL 数据库，支持复杂查询和事务处理。
 
-* [RocketMQ](./sink/RocketMQ.md)
+* [RocketMQ](./sink/rocketmq)
   * 发布数据到 RocketMQ 队列，适用于高可用的分布式消息传递。
 
-* [RabbitMQ](./sink/RabbitMQ.md)
+* [RabbitMQ](./sink/rabbitmq)
   * 将数据发布到 RabbitMQ 队列，适合消息驱动的架构。
 
-* [Oracle](./sink/Oracle.md)
+* [Oracle](./sink/oracle)
   * 将数据写入 Oracle 数据库，适用于企业级应用。
 
-* [MySQL](./sink/MySQL.md)
+* [MySQL](./sink/mysql)
   * 将数据存储到 MySQL 数据库，适合关系型数据存储。
 
-* [Pulsar](./sink/Pulsar.md)
+* [Pulsar](./sink/pulsar)
   * 发布数据到 Apache Pulsar，支持多租户和高吞吐量。
 
-* [Elasticsearch](./sink/Elasticsearch.md)
+* [Elasticsearch](./sink/elasticsearch)
   * 将数据写入 Elasticsearch，适合实时搜索和分析。

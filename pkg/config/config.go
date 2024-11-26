@@ -38,7 +38,7 @@ type TransformJsonPath struct {
 
 // TransformConfig transform config
 type TransformConfig struct {
-	Mode         string              `json:"mode" vd:"len($)>0"` // Mode: row, json
+	Mode         string              `json:"mode" vd:"len($)>0"` // Mode: row, json, jsonPath
 	Schemas      []TransformSchema   `json:"schemas"`            // Schema
 	RowSeparator string              `json:"row_separator"`      // only mode is row will affect, and also only row mode will use strings.Split to split
 	Paths        []TransformJsonPath `json:"paths"`              // json paths
