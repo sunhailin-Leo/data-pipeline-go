@@ -1,12 +1,13 @@
 package convert
 
 import (
-	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"strings"
 
 	"github.com/bytedance/sonic"
+	"github.com/cloudwego/gjson"
 	"github.com/spf13/cast"
 
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
@@ -21,15 +22,11 @@ func generateConvertResultData(sinkNames string, resultData map[string][]any, af
 // JsonPathToMap json path to map
 func JsonPathToMap(data []byte, paths []config.TransformJsonPath) map[string]any {
 	result := make(map[string]any)
+	dataStr := gjson.ParseBytes(data)
 	for _, path := range paths {
-		node, getNodeErr := sonic.Get(data, utils.StringSliceToInterface(strings.Split(path.Path, "."))...)
-		if getNodeErr != nil {
-			logger.Logger.Error(utils.LogServiceName + "[JsonPathToMap]Failed to get node from origin data! Error Cause: " + getNodeErr.Error())
-			continue
-		}
-		pathRes, getPathErr := node.Interface()
-		if getPathErr != nil {
-			logger.Logger.Error(utils.LogServiceName + "[JsonPathToMap]Failed to get node result! Error Cause: " + getPathErr.Error())
+		pathRes := dataStr.Get(path.Path).Value()
+		if pathRes == nil || path.DestField == "" {
+			logger.Logger.Error(utils.LogServiceName + "[JsonPathToMap]Failed to get jsonPath result! Error Path: " + path.Path)
 			continue
 		}
 		result[path.DestField] = pathRes
