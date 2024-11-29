@@ -9,7 +9,11 @@
     * [RabbitMQ](../source/rabbitmq)
     * [Redis](../source/redis)
     * [RocketMQ](../source/rocketmq)
-  * [Transform](../transform)
+  * Transform
+    * [转换常见选项](../transform/common_options)
+    * [类型转换](../transform/converter)
+    * [jsonPath 转换](../transform/jsonpath)
+    * [字段过滤](../transform/filter)
   * [Sink](../sink)
     * [ClickHouse](clickhouse)
     * [HTTP](http)

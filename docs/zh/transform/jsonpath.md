@@ -87,6 +87,7 @@ JsonPath
 ```
 
 ### 数据转换后,http-1接收到的请求数据
+```json
 {
   "author": [
     "Nigel Rees",
@@ -99,3 +100,4 @@ JsonPath
     8.99
   ]
 }
+```
