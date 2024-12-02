@@ -1,13 +1,11 @@
 MySQL
 ====
 
-# MySQLSinkConfig 结构体
-
 ## 概述
 
 `MySQLSinkConfig` 结构体用于配置 MySQL Sink，包括与 MySQL 数据库连接和数据传输相关的所有设置，以便将数据批量写入指定的 MySQL 表中。
+## MySQLSinkConfig 结构体
 
-## 结构体定义
 
 ```go
 type MySQLSinkConfig struct {

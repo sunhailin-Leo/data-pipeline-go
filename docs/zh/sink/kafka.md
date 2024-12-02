@@ -1,11 +1,10 @@
 Kafka
 =======
-# KafkaSinkConfig 结构体
 ## 概述
 `KafkaSinkConfig` 结构体用于配置 Kafka Sink，包括与 Kafka 消息传输相关的所有设置，以便将数据通过指定的消息格式发送到 Kafka 主题。
+## KafkaSinkConfig 结构体
 
-## 结构体定义
-```go
+```golang
 type KafkaSinkConfig struct {
 	Address     string `json:"address"`      // Kafka address
 	Topic       string `json:"topic"`        // Kafka Topic

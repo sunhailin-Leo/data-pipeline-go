@@ -4,7 +4,7 @@ ClickHouse
 ClickHouse Sink 负责将数据写入 ClickHouse 数据库。此配置允许用户自定义连接设置、数据表结构以及写入选项，以便实现高效的数据存储与分析。
 
 ## ClickhouseSinkConfig 结构体
-```json
+```golang
 type ClickhouseTableColumn struct {
   Name     string `json:"name"`     // 列的名称
   Type     string `json:"type"`     // 列的数据类型

@@ -1,15 +1,12 @@
 Oracle
 ====
 
-# OracleSinkConfig 结构体
-
 ## 概述
 
 `OracleSinkConfig` 结构体用于配置 Oracle Sink，包括与 Oracle 数据库连接和数据传输相关的所有设置，以便将数据批量写入指定的 Oracle 表中。
+## OracleSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type OracleSinkConfig struct {
 	Address   string `json:"address"`    // Oracle address
 	Username  string `json:"username"`   // Oracle username

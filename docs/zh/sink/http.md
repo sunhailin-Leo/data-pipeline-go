@@ -1,14 +1,11 @@
 HTTP
 ====
-# HTTPSinkConfig 结构体
-
 ## 概述
 
 `HTTPSinkConfig` 结构体用于配置 HTTP Sink，包括与 HTTP 请求相关的所有设置，以便将数据通过 HTTP 协议发送到指定的 URL。
+## HTTPSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type HTTPSinkConfig struct {
 	URL                     string            `json:"url"`
 	ContentType             string            `json:"content_type"`

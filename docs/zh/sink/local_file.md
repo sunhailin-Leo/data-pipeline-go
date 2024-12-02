@@ -1,15 +1,12 @@
 LocalFile
 ====
 
-# LocalFileSinkConfig 结构体
-
 ## 概述
 
 `LocalFileSinkConfig` 结构体用于配置本地文件 Sink，包括与文件存储相关的所有设置，以便将数据保存到本地文件中。
+## LocalFileSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type LocalFileSinkConfig struct {
 	FileName       string `json:"file_name"`
 	FileFormatType string `json:"file_format_type"` // file format type: text, csv

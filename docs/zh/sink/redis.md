@@ -1,15 +1,12 @@
 Redis
 ====
 
-# RedisSinkConfig 结构体
-
 ## 概述
 
 `RedisSinkConfig` 结构体用于配置 Redis Sink，包含与 Redis 数据传输相关的所有设置，以便将数据发送到 Redis 数据库中的指定键或频道。
+## RedisSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type RedisSinkConfig struct {
 	DBNum            int    `json:"db_num"`              // db number（0-15）,cluster mode is invalid
 	Expire           int    `json:"expire"`              // expire time, unit: seconds

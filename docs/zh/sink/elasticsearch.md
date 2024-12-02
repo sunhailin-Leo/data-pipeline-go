@@ -1,13 +1,10 @@
 Elasticsearch
 ====
 
-# ElasticsearchSinkConfig 结构体
-
 ## 概述
 
 `ElasticsearchSinkConfig` 结构体用于配置 Elasticsearch Sink，包括与 Elasticsearch 集群连接和数据传输相关的所有设置，以便将数据写入指定的 Elasticsearch 索引。
-
-## 结构体定义
+## ElasticsearchSinkConfig 结构体
 
 ```go
 type ElasticsearchSinkConfig struct {

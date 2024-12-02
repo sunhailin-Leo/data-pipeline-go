@@ -1,6 +1,6 @@
 RabbitMQ
 ===
-# RabbitMQ Source 配置
+## RabbitMQ Source 配置
 此配置定义了一个 RabbitMQ source，用于从 RabbitMQ 队列中消费消息。以下是 RabbitMQ source 的配置示例：
 ```json
 {

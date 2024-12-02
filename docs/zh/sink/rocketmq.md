@@ -1,15 +1,12 @@
 RocketMQ
 ====
 
-# RocketMQSinkConfig 结构体
-
 ## 概述
 
 `RocketMQSinkConfig` 结构体用于配置 RocketMQ Sink，包括与 RocketMQ 连接和消息传输相关的所有设置，以便将数据发送到指定的 RocketMQ Topic 中。
+## RocketMQSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang   
 type RocketMQSinkConfig struct {
 	Address     string `json:"address"`      // RocketMQ address
 	Topic       string `json:"topic"`        // RocketMQ Topic
