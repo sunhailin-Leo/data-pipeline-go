@@ -1,15 +1,12 @@
 RabbitMQ
 ====
 
-# RabbitMQSinkConfig 结构体
-
 ## 概述
 
 `RabbitMQSinkConfig` 结构体用于配置 RabbitMQ Sink，包括与 RabbitMQ 连接和消息传输相关的所有设置，以便将数据发送到指定的 RabbitMQ 队列。
+## RabbitMQSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type RabbitMQSinkConfig struct {
 	Address     string `json:"address"`      // RabbitMQ address
 	Username    string `json:"username"`     // RabbitMQ username

@@ -1,6 +1,6 @@
 Redis
 ===
-# Redis Source 配置文档
+## Redis Source 配置文档
 此配置定义了一个 Redis source，用于从 Redis 数据库中获取数据或订阅频道消息。以下是 Redis source 的配置示例：
 ```json
 {

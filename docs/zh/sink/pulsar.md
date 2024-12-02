@@ -1,15 +1,12 @@
 Pulsar
 ====
 
-# PulsarSinkConfig 结构体
-
 ## 概述
 
 `PulsarSinkConfig` 结构体用于配置 Pulsar Sink，包括与 Pulsar 连接和数据传输相关的所有设置，以便将数据发送到指定的 Pulsar Topic。
+## PulsarSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type PulsarSinkConfig struct {
 Address     string `json:"address"`      // Pulsar host
 Topic       string `json:"topic"`        // Pulsar Topic

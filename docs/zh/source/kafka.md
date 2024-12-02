@@ -1,7 +1,7 @@
 Kafka
 ====
 
-# Kafka Source 配置
+## Kafka Source 配置
 
 此配置定义了一个 Kafka source，用于从 Kafka 主题中读取数据。
 

@@ -1,6 +1,6 @@
 RocketMQ
 ===
-# RocketMQ Source 配置文档
+## RocketMQ Source 配置文档
 此配置定义了一个 RocketMQ source，用于从 RocketMQ 主题中消费消息。以下是 RocketMQ source 的配置示例：
 ```json
 {

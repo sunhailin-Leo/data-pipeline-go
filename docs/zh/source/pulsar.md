@@ -1,6 +1,6 @@
 Pulsar
 ===
-# Pulsar Source 配置
+## Pulsar Source 配置
 此配置定义了一个 Pulsar source，用于从 Pulsar 主题中读取数据。以下是 Pulsar source 的配置示例：
 
 ```json

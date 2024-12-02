@@ -1,15 +1,13 @@
 PostgresSQL
 ====
 
-# PostgresSQLSinkConfig 结构体
 
 ## 概述
 
 `PostgresSQLSinkConfig` 结构体用于配置 PostgresSQL Sink，包括与 PostgresSQL 数据库连接和数据传输相关的所有设置，以便将数据批量写入指定的数据库表中。
+## PostgresSQLSinkConfig 结构体
 
-## 结构体定义
-
-```go
+```golang
 type PostgresSQLSinkConfig struct {
 	Address   string `json:"address"`    // PostgresSQL address
 	Username  string `json:"username"`   // PostgresSQL username

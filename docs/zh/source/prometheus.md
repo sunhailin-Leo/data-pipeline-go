@@ -1,6 +1,6 @@
 Prometheus
 ====
-# Prometheus Source 配置
+## Prometheus Source 配置
 prom_metrics 是一个对象类型，用于配置从 Prometheus 获取指标的相关参数。下面是具体的配置说明：
 
 ```json
