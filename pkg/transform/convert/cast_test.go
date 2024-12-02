@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/cloudwego/gjson"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
@@ -228,4 +229,66 @@ func TestCastFunctionNameToFunctionResult(t *testing.T) {
 	// Test scenario 2: The input is something else, and the expected return is the input value itself
 	result2 := CastFunctionNameToFunctionResult("other-value")
 	assert.Equal(t, "other-value", result2)
+}
+
+func NewJsonPathToMap(data []byte, paths []config.TransformJsonPath) map[string]any {
+	result := make(map[string]any)
+	dataStr := gjson.ParseBytes(data).String()
+	for _, path := range paths {
+		pathRes := gjson.Get(dataStr, path.Path).Value()
+		if pathRes == nil {
+			continue
+		}
+		result[path.DestField] = pathRes
+	}
+
+	return result
+}
+
+func TestJsonPathQueriesToMap2(t *testing.T) {
+
+	data := []byte(`{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      {
+        "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      },
+      {
+        "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "price": 19.95
+    }
+  }
+}`)
+	paths := []config.TransformJsonPath{
+		{SrcField: "", Path: "store.book.#.author", DestField: "author"},
+		{SrcField: "", Path: "store.book.#(price>15)#.price", DestField: "price"},
+	}
+	result := NewJsonPathToMap(data, paths)
+	assert.Equal(t, 2, len(result))
+	assert.Equal(t, []interface{}{"Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"}, result["author"])
+	assert.Equal(t, []interface{}{22.99}, result["price"])
 }
