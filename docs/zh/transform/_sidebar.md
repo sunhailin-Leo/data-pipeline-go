@@ -3,12 +3,12 @@
   * [配置文件简介](../config)
 * Connector
   * [Source](../source)
-    * [Kafka](kafka)
-    * [Prometheus](prometheus)
-    * [Pulsar](pulsar)
-    * [RabbitMQ](rabbitmq)
-    * [Redis](redis)
-    * [RocketMQ](rocketmq)
+    * [Kafka](../source/kafka)
+    * [Prometheus](../source/prometheus)
+    * [Pulsar](../source/pulsar)
+    * [RabbitMQ](../source/rabbitmq)
+    * [Redis](../source/redis)
+    * [RocketMQ](../source/rocketmq)
   * Transform
     * [转换常见选项](../transform/common_options)
     * [字段类型转换](../transform/converter)
