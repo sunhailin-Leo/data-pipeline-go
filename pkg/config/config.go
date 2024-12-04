@@ -16,17 +16,18 @@ type SourceConfig struct {
 }
 
 // TransformSchema transform unit config
+// when is_ignore is True, sink_key and sink_name can be empty.
 type TransformSchema struct {
-	SourceKey    string `json:"source_key" vd:"len($)>0"`  // source key
-	SinkKey      string `json:"sink_key" vd:"len($)>0"`    // sink key
-	Converter    string `json:"converter"`                 // Converter, Like: toInt, toFloat32, toString, etc.
-	IsIgnore     bool   `json:"is_ignore"`                 // is ignored key
-	IsStrictMode bool   `json:"is_strict_mode"`            // is strict mode
-	IsKeepKeys   bool   `json:"is_keep_keys"`              // key is keep origin key
-	IsExpand     bool   `json:"is_expand"`                 // is expanded col
-	ExpandValue  any    `json:"expand_value"`              // expand value
-	SourceName   string `json:"source_name" vd:"len($)>0"` // source alias name
-	SinkName     string `json:"sink_name" vd:"len($)>0"`   // sink alias name
+	SourceKey    string `json:"source_key" vd:"len($)>0"`                       // source key
+	SinkKey      string `json:"sink_key" vd:"len($)>0 || (IsIgnore)$ == true"`  // sink key
+	Converter    string `json:"converter"`                                      // Converter, Like: toInt, toFloat32, toString, etc.
+	IsIgnore     bool   `json:"is_ignore"`                                      // is ignored key
+	IsStrictMode bool   `json:"is_strict_mode"`                                 // is strict mode
+	IsKeepKeys   bool   `json:"is_keep_keys"`                                   // key is keep origin key
+	IsExpand     bool   `json:"is_expand"`                                      // is expanded col
+	ExpandValue  any    `json:"expand_value"`                                   // expand value
+	SourceName   string `json:"source_name" vd:"len($)>0"`                      // source alias name
+	SinkName     string `json:"sink_name" vd:"len($)>0 || (IsIgnore)$ == true"` // sink alias name
 }
 
 // TransformJsonPath transform json path config

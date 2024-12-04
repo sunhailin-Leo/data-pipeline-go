@@ -12,6 +12,8 @@ JsonPath
 | `Path`      | `string` | 否  | JSON 路径（使用 JSONPath） |
 | `DestField` | `string` | 否  | 目标字段名                |
 
+> 使用(GJSON Playground 在线试验语法)[https://gjson.dev/]
+
 ## 示例
 假设我们有以下 来自kafka 的 JSON 数据：
 ```json

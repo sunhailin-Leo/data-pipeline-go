@@ -3,6 +3,7 @@ package config
 import (
 	"testing"
 
+	vd "github.com/bytedance/go-tagexpr/v2/validator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -87,4 +88,67 @@ func TestStreamConfigGetSinkTagBySinkName(t *testing.T) {
 	// Test non-existent source name
 	tag = streamConfig.GetSinkTagBySinkName("sink3")
 	assert.Equal(t, "", tag)
+}
+
+func TestTransformSchema(t *testing.T) {
+	// Test cases
+	testCases := []struct {
+		TransformSchema
+		wantErr bool
+	}{
+		// IsIgnore is true, SinkKey can be empty
+		{
+			TransformSchema: TransformSchema{
+				SourceKey:  "sourceKey",
+				SinkKey:    "",
+				Converter:  "toInt",
+				IsIgnore:   true,
+				SourceName: "sourceName",
+				SinkName:   "sinkName",
+			},
+			wantErr: false,
+		},
+		// IsIgnore is true, SinkKey can have a value
+		{
+			TransformSchema: TransformSchema{
+				SourceKey:  "sourceKey",
+				SinkKey:    "sinkKey",
+				Converter:  "toInt",
+				IsIgnore:   true,
+				SourceName: "sourceName",
+				SinkName:   "sinkName",
+			},
+			wantErr: false,
+		},
+		// IsIgnore is false, SinkKey cannot be empty
+		{
+			TransformSchema: TransformSchema{
+				SourceKey:  "sourceKey",
+				SinkKey:    "",
+				Converter:  "toInt",
+				IsIgnore:   false,
+				SourceName: "sourceName",
+				SinkName:   "sinkName",
+			},
+			wantErr: true,
+		},
+		// IsIgnore is false, SinkKey having a value is valid
+		{
+			TransformSchema: TransformSchema{
+				SourceKey:  "sourceKey",
+				SinkKey:    "sinkKey",
+				Converter:  "toInt",
+				IsIgnore:   false,
+				SourceName: "sourceName",
+				SinkName:   "sinkName",
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tc := range testCases {
+		schema := tc.TransformSchema
+		err := vd.Validate(schema)
+		assert.Equal(t, tc.wantErr, err)
+	}
 }
