@@ -24,7 +24,7 @@ require (
 	github.com/sijms/go-ora/v2 v2.8.22
 	github.com/spf13/cast v1.7.0
 	github.com/spf13/viper v1.19.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/twmb/franz-go v1.18.0
 	github.com/twmb/franz-go/plugin/kprom v1.1.0
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
