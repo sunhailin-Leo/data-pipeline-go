@@ -1,6 +1,7 @@
 module github.com/sunhailin-Leo/data-pipeline-go
 
 go 1.22.0
+toolchain go1.22.10
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.30.0
@@ -29,7 +30,7 @@ require (
 	github.com/twmb/franz-go/plugin/kprom v1.1.0
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
 	github.com/valyala/fasthttp v1.58.0
-	github.com/wagslane/go-rabbitmq v0.14.2
+	github.com/wagslane/go-rabbitmq v0.15.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
