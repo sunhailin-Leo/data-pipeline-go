@@ -23,5 +23,5 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.56.2
+          version: v1.62.2
           args: --enable=nolintlint,gochecknoinits,bodyclose,gocritic --verbose

@@ -27,4 +27,4 @@ jobs:
           export PATH=${PATH}:`go env GOPATH`/bin
           go install golang.org/x/vuln/cmd/govulncheck@latest
       - name: Run Govulncheck
-        run: "cd test && `go env GOPATH`/bin/govulncheck ./..."
+        run: "cd pkg && `go env GOPATH`/bin/govulncheck -show verbose ./..."

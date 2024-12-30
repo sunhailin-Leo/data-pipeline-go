@@ -82,37 +82,34 @@ func (p *PromMetricSourceHandler) FetchData() {
 	logger.Logger.Info(utils.LogServiceName +
 		"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]Start waiting for data to be written...")
 
-	for {
-		select {
-		case <-p.ticker.C:
-			p.Metrics.OnSourceInput(p.StreamName, p.SourceAliasName)
-			p.Metrics.OnSourceInputSuccess(p.StreamName, p.SourceAliasName)
+	for range p.ticker.C {
+		p.Metrics.OnSourceInput(p.StreamName, p.SourceAliasName)
+		p.Metrics.OnSourceInputSuccess(p.StreamName, p.SourceAliasName)
 
-			metricsBody, getMetricsErr := p.getMetrics()
-			if getMetricsErr != nil {
-				logger.Logger.Error(utils.LogServiceName +
-					"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]Get data error, Reason for exception: " + getMetricsErr.Error())
-				return
+		metricsBody, getMetricsErr := p.getMetrics()
+		if getMetricsErr != nil {
+			logger.Logger.Error(utils.LogServiceName +
+				"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]Get data error, Reason for exception: " + getMetricsErr.Error())
+			return
+		}
+		parseResult, parseErr := p.parseMetrics(metricsBody)
+		if parseErr != nil {
+			logger.Logger.Error(utils.LogServiceName +
+				"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]Parse data error, Reason for exception: " + parseErr.Error())
+			return
+		}
+		if p.DebugMode || p.GetToTransformChan() == nil {
+			logger.Logger.Info(utils.LogServiceName +
+				"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]PromMetrics consume data: " + string(parseResult))
+		} else {
+			logger.Logger.Debug(utils.LogServiceName +
+				"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]PromMetrics consume data: " + string(parseResult))
+			p.GetToTransformChan() <- &models.SourceOutput{
+				MetaData:   p.MetaData,
+				SourceData: parseResult,
 			}
-			parseResult, parseErr := p.parseMetrics(metricsBody)
-			if parseErr != nil {
-				logger.Logger.Error(utils.LogServiceName +
-					"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]Parse data error, Reason for exception: " + parseErr.Error())
-				return
-			}
-			if p.DebugMode || p.GetToTransformChan() == nil {
-				logger.Logger.Info(utils.LogServiceName +
-					"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]PromMetrics consume data: " + string(parseResult))
-			} else {
-				logger.Logger.Debug(utils.LogServiceName +
-					"[PromMetrics-Source][Current config: " + p.SourceAliasName + "]PromMetrics consume data: " + string(parseResult))
-				p.GetToTransformChan() <- &models.SourceOutput{
-					MetaData:   p.MetaData,
-					SourceData: parseResult,
-				}
-				p.Metrics.OnSourceOutput(p.StreamName, p.SourceAliasName)
-				p.Metrics.OnSourceOutputSuccess(p.StreamName, p.SourceAliasName)
-			}
+			p.Metrics.OnSourceOutput(p.StreamName, p.SourceAliasName)
+			p.Metrics.OnSourceOutputSuccess(p.StreamName, p.SourceAliasName)
 		}
 	}
 }

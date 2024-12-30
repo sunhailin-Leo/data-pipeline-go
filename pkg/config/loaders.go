@@ -346,7 +346,7 @@ func (c *TunnelConfigLoader) loadFromZookeeper() {
 	zkConfigPathObj := viper.Get(utils.ConfigFromZookeeperEnvConfigPath)
 	if zkConfigPathObj == nil {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Zookeeper config error, reason: ZOOKEEPER_CONFIG_PATH is empty")
-		os.Exit(1)
+		return
 	}
 
 	configData, _, getErr := conn.Get(cast.ToString(zkConfigPathObj))

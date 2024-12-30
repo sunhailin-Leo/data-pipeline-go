@@ -87,7 +87,7 @@ func (l *LocalFileSinkHandler) WriteData() {
 func (l *LocalFileSinkHandler) InitSink() {
 	switch l.sinkLocalFileCfg.FileFormatType {
 	case utils.LocalFileCSVFormatType:
-		file, err := os.OpenFile(l.sinkLocalFileCfg.FileName+".csv", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		file, err := os.OpenFile(l.sinkLocalFileCfg.FileName+".csv", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 		if err != nil {
 			logger.Logger.Error(utils.LogServiceName +
 				"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Failed to open csv file! Reason for error: " + err.Error())
@@ -97,7 +97,7 @@ func (l *LocalFileSinkHandler) InitSink() {
 		l.file = file
 		l.csvWriter = csvWriter
 	case utils.LocalFileTextFormatType:
-		file, err := os.OpenFile(l.sinkLocalFileCfg.FileName+".txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		file, err := os.OpenFile(l.sinkLocalFileCfg.FileName+".txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 		if err != nil {
 			logger.Logger.Error(utils.LogServiceName +
 				"[LocalFile-Sink][Current config: " + l.SinkAliasName + "]Failed to open txt file! Reason for error: " + err.Error())
