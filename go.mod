@@ -21,7 +21,7 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/prometheus/common v0.61.0
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/sijms/go-ora/v2 v2.8.22
+	github.com/sijms/go-ora/v2 v2.8.23
 	github.com/spf13/cast v1.7.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
