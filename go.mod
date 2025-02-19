@@ -3,7 +3,7 @@ module github.com/sunhailin-Leo/data-pipeline-go
 go 1.22.10
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.31.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.32.1
 	github.com/apache/pulsar-client-go v0.14.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
@@ -41,7 +41,7 @@ require (
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.1 // indirect
 	github.com/AthenZ/athenz v1.10.39 // indirect
-	github.com/ClickHouse/ch-go v0.64.1 // indirect
+	github.com/ClickHouse/ch-go v0.65.0 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-pop v0.0.6 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
