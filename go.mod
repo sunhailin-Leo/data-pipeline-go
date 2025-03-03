@@ -8,7 +8,7 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/bytedance/go-tagexpr/v2 v2.9.11
-	github.com/bytedance/sonic v1.12.9
+	github.com/bytedance/sonic v1.12.10
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/cloudwego/gjson v0.1.0
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
