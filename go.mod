@@ -3,7 +3,7 @@ module github.com/sunhailin-Leo/data-pipeline-go
 go 1.22.10
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.33.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.33.1
 	github.com/apache/pulsar-client-go v0.14.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
