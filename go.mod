@@ -23,7 +23,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.3
 	github.com/sijms/go-ora/v2 v2.8.24
 	github.com/spf13/cast v1.7.1
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/twmb/franz-go v1.18.1
 	github.com/twmb/franz-go/plugin/kprom v1.1.0
