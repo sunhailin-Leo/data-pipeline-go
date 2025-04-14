@@ -17,7 +17,7 @@ require (
 	github.com/go-zookeeper/zk v1.0.4
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/nacos-group/nacos-sdk-go/v2 v2.2.9
-	github.com/panjf2000/ants/v2 v2.11.2
+	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/prometheus/client_golang v1.22.0
 	github.com/prometheus/common v0.63.0
 	github.com/redis/go-redis/v9 v9.7.3
