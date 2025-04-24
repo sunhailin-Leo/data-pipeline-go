@@ -26,7 +26,7 @@ require (
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/twmb/franz-go v1.18.1
-	github.com/twmb/franz-go/plugin/kprom v1.1.0
+	github.com/twmb/franz-go/plugin/kprom v1.2.1
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
 	github.com/valyala/fasthttp v1.59.0
 	github.com/wagslane/go-rabbitmq v0.15.0
