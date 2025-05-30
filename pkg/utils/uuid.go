@@ -169,11 +169,12 @@ func Parse(s string) (UUID, error) {
 		return UUID{}, errInvalidLength
 	}
 
-	switch { // assert version
-	case (b[6] & 0xf0) == 0x40: // version 4
-	case (b[6] & 0xf0) == 0x70: // version 7
+	switch v := b[6] & 0xf0; v { // assert version
+	case 0x40: // version 4
+	case 0x70: // version 7
 	default:
-		return UUID{}, errors.New(errUnsupportedVersion.Error() + ": " + string(b[6]&0xf0>>4))
+		return UUID{}, errors.New(errUnsupportedVersion.Error() + ": " + string(v>>4))
+
 	}
 
 	if (b[8] & 0xc0) != 0x80 { // assert variant

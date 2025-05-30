@@ -138,7 +138,7 @@ func (s *Handler) Start() {
 
 // start prometheus and pprof http service
 func (s *Handler) startMetrics() {
-	http.Handle(utils.PromHTTPRoute, s.BaseStream.metrics.Handler())
+	http.Handle(utils.PromHTTPRoute, s.metrics.Handler())
 	go func() {
 		if err := http.ListenAndServe(":"+utils.PromHTTPServerPort, nil); err != nil {
 			logger.Logger.Fatal(utils.LogServiceName + "failed to start metrics service! Error reason: " + err.Error())
