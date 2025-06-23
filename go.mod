@@ -21,7 +21,7 @@ require (
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.2
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/prometheus/client_golang v1.22.0
-	github.com/prometheus/common v0.64.0
+	github.com/prometheus/common v0.65.0
 	github.com/redis/go-redis/v9 v9.10.0
 	github.com/sijms/go-ora/v2 v2.9.0
 	github.com/spf13/cast v1.9.2
