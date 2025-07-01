@@ -30,7 +30,7 @@ require (
 	github.com/twmb/franz-go v1.19.5
 	github.com/twmb/franz-go/plugin/kprom v1.2.1
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
-	github.com/valyala/fasthttp v1.62.0
+	github.com/valyala/fasthttp v1.63.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.0
@@ -68,7 +68,7 @@ require (
 	github.com/aliyun/credentials-go v1.4.3 // indirect
 	github.com/andeya/ameda v1.5.3 // indirect
 	github.com/andeya/goutil v1.0.1 // indirect
-	github.com/andybalholm/brotli v1.1.1 // indirect
+	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/ardielle/ardielle-go v1.5.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.4.0 // indirect
