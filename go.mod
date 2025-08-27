@@ -5,7 +5,7 @@ go 1.23.8
 toolchain go1.23.9
 
 require (
-	github.com/ClickHouse/clickhouse-go/v2 v2.39.0
+	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
 	github.com/apache/pulsar-client-go v0.15.1
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
