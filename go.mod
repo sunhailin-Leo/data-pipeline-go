@@ -20,7 +20,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.2
 	github.com/panjf2000/ants/v2 v2.11.3
-	github.com/prometheus/client_golang v1.22.0
+	github.com/prometheus/client_golang v1.23.0
 	github.com/prometheus/common v0.65.0
 	github.com/redis/go-redis/v9 v9.11.0
 	github.com/sijms/go-ora/v2 v2.9.0
