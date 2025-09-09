@@ -12,7 +12,7 @@ require (
 	github.com/bytedance/go-tagexpr/v2 v2.9.11
 	github.com/bytedance/sonic v1.14.1
 	github.com/cenkalti/backoff/v4 v4.3.0
-	github.com/cloudwego/gjson v0.1.0
+	github.com/cloudwego/gjson v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/go-sql-driver/mysql v1.9.3
