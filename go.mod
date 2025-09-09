@@ -10,7 +10,7 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/bytedance/go-tagexpr/v2 v2.9.11
-	github.com/bytedance/sonic v1.14.0
+	github.com/bytedance/sonic v1.14.1
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/cloudwego/gjson v0.1.0
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
@@ -73,10 +73,11 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.4.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
+	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clbanning/mxj/v2 v2.5.5 // indirect
-	github.com/cloudwego/base64x v0.1.5 // indirect
+	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/deckarep/golang-set v1.7.1 // indirect
