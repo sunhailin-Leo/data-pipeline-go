@@ -17,7 +17,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/go-zookeeper/zk v1.0.4
-	github.com/jackc/pgx/v5 v5.7.5
+	github.com/jackc/pgx/v5 v5.7.6
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.3
 	github.com/panjf2000/ants/v2 v2.11.3
 	github.com/prometheus/client_golang v1.23.2
