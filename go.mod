@@ -1,8 +1,6 @@
 module github.com/sunhailin-Leo/data-pipeline-go
 
-go 1.23.8
-
-toolchain go1.23.9
+go 1.24.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.1
