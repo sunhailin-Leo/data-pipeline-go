@@ -28,7 +28,7 @@ require (
 	github.com/twmb/franz-go v1.19.5
 	github.com/twmb/franz-go/plugin/kprom v1.3.0
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
-	github.com/valyala/fasthttp v1.65.0
+	github.com/valyala/fasthttp v1.67.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.0
@@ -151,7 +151,7 @@ require (
 	golang.org/x/arch v0.17.0 // indirect
 	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/mod v0.27.0 // indirect
-	golang.org/x/net v0.44.0 // indirect
+	golang.org/x/net v0.45.0 // indirect
 	golang.org/x/oauth2 v0.31.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
