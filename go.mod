@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.3
-	github.com/apache/pulsar-client-go v0.16.0
+	github.com/apache/pulsar-client-go v0.17.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/bytedance/go-tagexpr/v2 v2.9.11
@@ -100,14 +100,13 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
-	github.com/hamba/avro/v2 v2.26.0 // indirect
+	github.com/hamba/avro/v2 v2.29.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jmespath/go-jmespath v0.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
