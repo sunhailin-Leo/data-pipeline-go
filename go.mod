@@ -31,7 +31,7 @@ require (
 	github.com/valyala/fasthttp v1.68.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.uber.org/automaxprocs v1.6.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
