@@ -28,7 +28,7 @@ require (
 	github.com/twmb/franz-go v1.20.6
 	github.com/twmb/franz-go/plugin/kprom v1.3.0
 	github.com/twmb/franz-go/plugin/kzap v1.1.2
-	github.com/valyala/fasthttp v1.68.0
+	github.com/valyala/fasthttp v1.69.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/zap v1.27.1
