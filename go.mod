@@ -1,6 +1,6 @@
 module github.com/sunhailin-Leo/data-pipeline-go
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
@@ -15,7 +15,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.19.3
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/go-zookeeper/zk v1.0.4
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.9.1
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
 	github.com/panjf2000/ants/v2 v2.11.5
 	github.com/prometheus/client_golang v1.23.2
