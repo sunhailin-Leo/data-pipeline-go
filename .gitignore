@@ -23,3 +23,10 @@ go.work.sum
 
 # env file
 .env
+
+# Benchmark results
+benchmark_results.txt
+
+# Coverage files
+coverage.out
+coverage.html

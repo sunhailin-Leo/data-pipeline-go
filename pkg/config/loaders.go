@@ -25,6 +25,17 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
+var heartbeatDone = make(chan struct{})
+
+const (
+	defaultApolloNamespace       = "application"
+	defaultApolloCluster         = "default"
+	apolloSyncServerTimeout      = 3
+	defaultNacosLogDir           = "/tmp/nacos/log"
+	defaultNacosCacheDir         = "/tmp/nacos/cache"
+	defaultHeartbeatIntervalSecs = 15
+)
+
 type TunnelConfigLoader struct {
 	config *TunnelConfig
 }
@@ -79,6 +90,7 @@ func (c *TunnelConfigLoader) validateConfig(cfg *TunnelConfig) error {
 		if ok {
 			return errors.New("stream name " + stream.Name + " is duplicated")
 		}
+		streamNameMap[stream.Name] = struct{}{}
 	}
 	return nil
 }
@@ -105,6 +117,7 @@ func (c *TunnelConfigLoader) loadFromLocal(path string) {
 		logger.Logger.Fatal("Project configuration file read failed! Error reason: " + readerErr.Error())
 		os.Exit(1)
 	}
+	defer reader.Close()
 	// create cache buffer to get file content
 	data := make([]byte, reader.Len())
 	if _, err := reader.ReadAt(data, 0); err != nil {
@@ -138,7 +151,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 	var apolloNamespace string
 	apolloNamespaceObj := viper.Get(utils.ConfigFromApolloEnvNamespace)
 	if apolloNamespaceObj == nil {
-		apolloNamespace = "application"
+		apolloNamespace = defaultApolloNamespace
 		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_NAMESPACE is empty, use default NamespaceName to instead")
 	} else {
 		apolloNamespace = cast.ToString(apolloNamespaceObj)
@@ -148,7 +161,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 	var apolloClusterKey string
 	apolloClusterKeyObj := viper.Get(utils.ConfigFromApolloEnvClusterKey)
 	if apolloClusterKeyObj == nil {
-		apolloClusterKey = "default"
+		apolloClusterKey = defaultApolloCluster
 		logger.Logger.Warn(utils.LogServiceName + "Load Apollo config error, reason: APOLLO_CLUSTER_KEY is empty, use default NamespaceName to instead")
 	} else {
 		apolloClusterKey = cast.ToString(apolloClusterKeyObj)
@@ -169,7 +182,7 @@ func (c *TunnelConfigLoader) loadFromApollo() {
 		Cluster:           apolloClusterKey,
 		IP:                apolloHost,
 		NamespaceName:     apolloNamespace,
-		SyncServerTimeout: 3, // hard code 3 secs
+		SyncServerTimeout: apolloSyncServerTimeout,
 		MustStart:         true,
 	}
 
@@ -248,6 +261,7 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 		Password: redisPassword,
 		DB:       redisDBNum,
 	})
+	defer client.Close()
 	if pingErr := client.Ping(context.Background()).Err(); pingErr != nil {
 		logger.Logger.Error(utils.LogServiceName + "Failed to connect Redis! Reason for exception: " + pingErr.Error())
 		return
@@ -292,8 +306,8 @@ func (c *TunnelConfigLoader) loadFromNacos() {
 		NamespaceId:         nacosNamespaceId, // 如果不需要命名空间，可以留空
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "/tmp/nacos/log",
-		CacheDir:            "/tmp/nacos/cache",
+		LogDir:              defaultNacosLogDir,
+		CacheDir:            defaultNacosCacheDir,
 		LogLevel:            "debug",
 	}
 	// create config client
@@ -305,6 +319,7 @@ func (c *TunnelConfigLoader) loadFromNacos() {
 		logger.Logger.Fatal(utils.LogServiceName + "failed to create Nacos client, Reason for exception: " + createClientErr.Error())
 		return
 	}
+	defer configClient.CloseClient()
 
 	nacosDataIdObj := viper.Get(utils.ConfigFromNacosEnvDataId)
 	nacosGroupObj := viper.Get(utils.ConfigFromNacosEnvGroup)
@@ -393,31 +408,35 @@ func (c *TunnelConfigLoader) loadFromHTTP() {
 	fasthttp.ReleaseRequest(clientReq)
 	fasthttp.ReleaseResponse(clientResp)
 
-	// heart beat
+	// heart beat (optional)
 	httpHeartBeatUriObj := viper.Get(utils.ConfigFromHTTPEnvHeartBeatURI)
-	if httpHeartBeatUriObj != nil {
-		logger.Logger.Fatal(utils.LogServiceName + "Load HTTP config error, reason: HTTP_HEARTBEAT_URI is empty")
-		os.Exit(1)
+	if httpHeartBeatUriObj == nil {
+		logger.Logger.Info(utils.LogServiceName + "HTTP heartbeat URI is not configured, skip heartbeat")
 	} else {
 		httpHeartBeatIntervalSecsObj := viper.Get(utils.ConfigFromHTTPEnvHeartBeatIntervalSecs)
 		if httpHeartBeatIntervalSecsObj == nil {
 			// default interval 15 secs
-			httpHeartBeatIntervalSecsObj = 15
+			httpHeartBeatIntervalSecsObj = defaultHeartbeatIntervalSecs
 		}
 
 		// heart beat
 		go func(c *fasthttp.Client) {
 			for {
-				heartBeatReq := fasthttp.AcquireRequest()
-				heartBeatReq.SetRequestURI(cast.ToString(httpHostsObj) + cast.ToString(httpHeartBeatUriObj))
-				heartBeatReq.Header.SetMethod(fasthttp.MethodGet)
+				select {
+				case <-heartbeatDone:
+					return
+				case <-time.After(time.Duration(cast.ToInt(httpHeartBeatIntervalSecsObj)) * time.Second):
+					heartBeatReq := fasthttp.AcquireRequest()
+					heartBeatReq.SetRequestURI(cast.ToString(httpHostsObj) + cast.ToString(httpHeartBeatUriObj))
+					heartBeatReq.Header.SetMethod(fasthttp.MethodGet)
 
-				if heartBeatErr := c.Do(heartBeatReq, nil); heartBeatErr != nil {
-					logger.Logger.Error(utils.LogServiceName + "failed to keep heartbeat, Reason for exception: " + heartBeatErr.Error())
-					break
+					if heartBeatErr := c.Do(heartBeatReq, nil); heartBeatErr != nil {
+						logger.Logger.Error(utils.LogServiceName + "failed to keep heartbeat, Reason for exception: " + heartBeatErr.Error())
+						break
+					}
+
+					fasthttp.ReleaseRequest(heartBeatReq)
 				}
-
-				time.Sleep(time.Duration(cast.ToInt(httpHeartBeatIntervalSecsObj)) * time.Second)
 			}
 		}(client)
 	}

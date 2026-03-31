@@ -3,8 +3,8 @@
 
 ## 项目介绍
 * 基于 Golang 实现一个类似 SeaTunnel 的数据同步工具, 主要是为了简便易用
-* **文档在 docs 目录下** 【To be continued!】
-* **示例在 example 目录下** 【To be continued!】
+* **文档在 docs 目录下**（使用 docsify 构建）
+* **示例在 example 目录下**
 
 ### 项目架构
 ![framework.jpg](../static/framework.jpg)
@@ -16,7 +16,7 @@
   * 安装完后加环境变量即可
 
 * golangci-lint
-  * 安装: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.59.1` 或 `brew install golangci-lint`
+  * 安装: `curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.1.6` 或 `brew install golangci-lint`
   * 检查: `golangci-lint --version`
 
 * nilaway
@@ -99,7 +99,7 @@ docsify serve docs
 
 ### 直接运行
 ```shell
-# go version >= 1.22.0
+# go version >= 1.24.0
 # 以本地配置文件为例
 export CONFIG_SRC=local 
 export LOCAL_PATH=../example/kafka_to_http.json 
@@ -107,7 +107,7 @@ cd data-pipeline-go/cmd && go run main.go
 ```
 ### 从二进制文件启动
 ```shell
-# go version >= 1.22.0
+# go version >= 1.24.0
 cd data-pipeline-go/cmd
 # 设置环境变量
 export CONFIG_SRC=local
@@ -128,6 +128,21 @@ go build -o data-pipeline-go ./main.go
 
 #### HTTP 接口 打印请求数据
 ![http_resp.png](../static/http_resp.png)
+
+### 从 Docker 启动
+```shell
+# 使用 docker-compose 启动（包含 Kafka）
+docker-compose up -d
+
+# 或者单独构建并运行
+docker build -t data-pipeline-go .
+docker run -d \
+  -p 8080:8080 \
+  -e CONFIG_SRC=local \
+  -e LOCAL_PATH=/app/example/kafka_to_http.json \
+  -v $(pwd)/example:/app/example \
+  data-pipeline-go
+```
 
 ## 实现模块
 

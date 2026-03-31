@@ -1,3 +1,36 @@
+* 2026-03-31 v0.3.0
+  * Bug Fixes
+    - Fixed validateConfig stream name deduplication check not writing to map
+    - Fixed loadFromHTTP heartbeat judgment logic inversion
+    - Fixed encodeHexWithoutDash UUID offset calculation error
+    - Fixed TestTransformSchema assertion logic error
+    - Fixed StringSliceToMap missing boundary protection
+    - Fixed RowMode missing index out-of-bounds protection
+  * Performance
+    - Refactored CastTypes to map lookup pattern, reduced ~70% code
+    - Extracted helper functions in processBySink to eliminate duplicate code
+    - Optimized convertToRowBytes with strings.Builder for string concatenation
+    - Pre-allocated capacity for slice/map optimization
+  * Improvements
+    - Added graceful shutdown timeout mechanism (30 seconds)
+    - Metrics server supports graceful stop
+    - Fixed resource leaks (mmap reader, Redis client, Nacos client)
+    - Added exit control for HTTP heartbeat goroutine
+    - Extracted hardcoded constants
+  * Documentation
+    - Enriched README.md core architecture description
+    - Improved docs/zh/config.md configuration file detailed description
+    - Added ACK mode, jsonPath mode, Console Sink documentation
+    - Updated Go version and golangci-lint version
+  * DevOps
+    - Added .golangci.yml configuration file
+    - Added Dockerfile and docker-compose.yml
+    - Added GitHub Actions test coverage CI
+    - Improved Makefile
+  * Tests
+    - Added loaders_test.go, stream/handler_test.go, console sink tests
+    - Added utils/config/transform/middlewares Benchmark
+
 * 2024-11-01 v0.2.3
   * Supported load config from HTTP-Get
 

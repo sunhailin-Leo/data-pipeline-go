@@ -1,11 +1,13 @@
 package stream
 
 import (
+	"context"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
@@ -16,6 +18,9 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/transform"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
+
+// package-level variable for metrics server
+var metricsServer *http.Server
 
 type Handler struct {
 	BaseStream
@@ -96,8 +101,16 @@ func (s *Handler) InitStream() {
 	for _, streamConfig := range s.streamsConfig {
 		if streamConfig.Enable {
 			sourceChanMap := s.GetSource(streamConfig)
-			// TODO - 未来兼容多输入源的时候需要改造
-			sourceChan := sourceChanMap[streamConfig.Source[0].SourceName]
+			// multi-source fan-in: merge all source channels into one
+			var sourceChan chan *models.SourceOutput
+			if len(sourceChanMap) == 1 {
+				for _, ch := range sourceChanMap {
+					sourceChan = ch
+				}
+			} else {
+				sourceChan = s.mergeSourceChannels(sourceChanMap, streamConfig.ChannelSize)
+				logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Multi-source fan-in enabled for stream: " + streamConfig.Name)
+			}
 			sinkChanMap := s.GetSink(streamConfig)
 			transformObj := s.GetTransform(sourceChan, sinkChanMap, streamConfig)
 			s.streamMap[streamConfig.Name] = transformObj
@@ -139,12 +152,17 @@ func (s *Handler) Start() {
 // start prometheus and pprof http service
 func (s *Handler) startMetrics() {
 	http.Handle(utils.PromHTTPRoute, s.metrics.Handler())
+	metricsServer = &http.Server{
+		Addr: ":" + utils.PromHTTPServerPort,
+	}
 	go func() {
-		if err := http.ListenAndServe(":"+utils.PromHTTPServerPort, nil); err != nil {
+		if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Logger.Fatal(utils.LogServiceName + "failed to start metrics service! Error reason: " + err.Error())
 		}
 	}()
 }
+
+const gracefulShutdownTimeout = 30 * time.Second
 
 // runs the service until catching os.Signal.
 func (s *Handler) spin() {
@@ -157,12 +175,23 @@ func (s *Handler) spin() {
 	go func() {
 		defer close(done)
 		s.CloseStream()
+		// shutdown metrics server gracefully
+		if metricsServer != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err := metricsServer.Shutdown(ctx); err != nil {
+				logger.Logger.Error(utils.LogServiceName + "metrics server shutdown error: " + err.Error())
+			}
+		}
 	}()
 
 	select {
 	case <-quitChan:
 		logger.Logger.Info(utils.LogServiceName + "receive quit signal twice, force shutdown")
+	case <-time.After(gracefulShutdownTimeout):
+		logger.Logger.Info(utils.LogServiceName + "graceful shutdown timeout, force shutdown")
 	case <-done:
+		logger.Logger.Info(utils.LogServiceName + "service shutdown gracefully")
 	}
 }
 

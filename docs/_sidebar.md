@@ -1,6 +1,6 @@
-* [介绍](zh/README) 
+* [Introduction](zh/README) 
 * Concepts
-  * [配置文件简介](zh/config)
+  * [Configuration](zh/config)
 * Connector
   * [Source](zh/source)
     * [Kafka](zh/source/kafka)
@@ -10,10 +10,10 @@
     * [Redis](zh/source/redis)
     * [RocketMQ](zh/source/rocketmq)
   * Transform
-    * [转换常见选项](zh/transform/common_options)
-    * [类型转换](zh/transform/converter)
-    * [jsonPath 转换](zh/transform/jsonpath)
-    * [字段过滤](zh/transform/filter)
+    * [Common Options](zh/transform/common_options)
+    * [Type Converter](zh/transform/converter)
+    * [JsonPath](zh/transform/jsonpath)
+    * [Field Filter](zh/transform/filter)
   * [Sink](zh/sink)
     * [ClickHouse](zh/sink/clickhouse)
     * [HTTP](zh/sink/http)
@@ -27,3 +27,4 @@
     * [MySQL](zh/sink/mysql)
     * [Pulsar](zh/sink/pulsar)
     * [Elasticsearch](zh/sink/elasticsearch)
+    * [Console](zh/sink/console)

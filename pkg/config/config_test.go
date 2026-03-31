@@ -149,6 +149,44 @@ func TestTransformSchema(t *testing.T) {
 	for _, tc := range testCases {
 		schema := tc.TransformSchema
 		err := vd.Validate(schema)
-		assert.Equal(t, tc.wantErr, err)
+		if tc.wantErr {
+			assert.Error(t, err, "expected validation error for schema: %+v", schema)
+		} else {
+			assert.NoError(t, err, "unexpected validation error for schema: %+v", schema)
+		}
+	}
+}
+
+func BenchmarkGetSourceBySourceName(b *testing.B) {
+	streamConfig := &StreamConfig{
+		Source: []*SourceConfig{
+			{SourceName: "source1"},
+			{SourceName: "source2"},
+			{SourceName: "source3"},
+			{SourceName: "source4"},
+			{SourceName: "source5"},
+		},
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = streamConfig.GetSourceBySourceName("source3")
+	}
+}
+
+func BenchmarkGetSinkBySinkName(b *testing.B) {
+	streamConfig := &StreamConfig{
+		Sink: []*SinkConfig{
+			{SinkName: "sink1"},
+			{SinkName: "sink2"},
+			{SinkName: "sink3"},
+			{SinkName: "sink4"},
+			{SinkName: "sink5"},
+		},
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = streamConfig.GetSinkBySinkName("sink3")
 	}
 }

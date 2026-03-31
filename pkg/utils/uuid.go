@@ -130,11 +130,11 @@ func encodeHex(dst []byte, uuid UUID) {
 }
 
 func encodeHexWithoutDash(dst []byte, uuid UUID) {
-	hex.Encode(dst, uuid[:4])
-	hex.Encode(dst[8:13], uuid[4:6])
+	hex.Encode(dst[0:8], uuid[0:4])
+	hex.Encode(dst[8:12], uuid[4:6])
 	hex.Encode(dst[12:16], uuid[6:8])
 	hex.Encode(dst[16:20], uuid[8:10])
-	hex.Encode(dst[20:], uuid[10:])
+	hex.Encode(dst[20:32], uuid[10:16])
 }
 
 // Parse a UUID string with or without the dashes.

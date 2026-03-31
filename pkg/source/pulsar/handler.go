@@ -56,7 +56,7 @@ func (p *PulsarSourceHandler) FetchData() {
 		} else {
 			logger.Logger.Debug(utils.LogServiceName +
 				"[Pulsar-Source][Current config: " + p.SourceAliasName + "]Pulsar consume data: " + string(receiveMsg.Payload()))
-			// 往 Transform 管道写数据
+			// Write data to Transform pipeline
 			p.GetToTransformChan() <- &models.SourceOutput{
 				MetaData:   p.MetaData,
 				SourceData: receiveMsg,

@@ -56,122 +56,46 @@ func MapToJson(data map[string]any) []byte {
 	return result
 }
 
+// castFunc is a type converter function that returns the converted value and an error.
+type castFunc func(any) (any, error)
+
+// castFuncMap maps converter names to their corresponding cast functions.
+var castFuncMap = map[string]castFunc{
+	"toBool":      func(v any) (any, error) { return cast.ToBoolE(v) },
+	"toFloat64":   func(v any) (any, error) { return cast.ToFloat64E(v) },
+	"toFloat32":   func(v any) (any, error) { return cast.ToFloat32E(v) },
+	"toInt64":     func(v any) (any, error) { return cast.ToInt64E(v) },
+	"toInt32":     func(v any) (any, error) { return cast.ToInt32E(v) },
+	"toInt16":     func(v any) (any, error) { return cast.ToInt16E(v) },
+	"toInt8":      func(v any) (any, error) { return cast.ToInt8E(v) },
+	"toInt":       func(v any) (any, error) { return cast.ToIntE(v) },
+	"toUint":      func(v any) (any, error) { return cast.ToUintE(v) },
+	"toUint64":    func(v any) (any, error) { return cast.ToUint64E(v) },
+	"toUint32":    func(v any) (any, error) { return cast.ToUint32E(v) },
+	"toUint16":    func(v any) (any, error) { return cast.ToUint16E(v) },
+	"toUint8":     func(v any) (any, error) { return cast.ToUint8E(v) },
+	"toString":    func(v any) (any, error) { return cast.ToStringE(v) },
+	"toStringMap": func(v any) (any, error) { return cast.ToStringMapE(v) },
+}
+
 // CastTypes data type conversion
 func CastTypes(data any, convertorName string) any {
 	if convertorName == "" {
 		return data
 	}
-	// based on convertorName to convert
-	switch convertorName {
-	case "toBool":
-		v, err := cast.ToBoolE(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toBool]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toFloat64":
-		v, err := cast.ToFloat64E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toFloat64]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toFloat32":
-		v, err := cast.ToFloat32E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toFloat32]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toInt64":
-		v, err := cast.ToInt64E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toInt64]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toInt32":
-		v, err := cast.ToInt32E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toInt32]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toInt16":
-		v, err := cast.ToInt16E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toInt16]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toInt8":
-		v, err := cast.ToInt8E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toInt8]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toInt":
-		v, err := cast.ToIntE(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toInt]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toUint":
-		v, err := cast.ToUintE(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toUint]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toUint64":
-		v, err := cast.ToUint64E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toUint64]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toUint32":
-		v, err := cast.ToUint32E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toUint32]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toUint16":
-		v, err := cast.ToUint16E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toUint16]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toUint8":
-		v, err := cast.ToUint8E(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toUint8]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toString":
-		v, err := cast.ToStringE(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toString]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	case "toStringMap":
-		v, err := cast.ToStringMapE(data)
-		if err != nil {
-			logger.Logger.Error(utils.LogServiceName + "[CastTypes-toStringMap]Data conversion failed! Reason for error: " + err.Error())
-			return nil
-		}
-		return v
-	default:
-		logger.Logger.Error(utils.LogServiceName + "[CastTypes-convertMap]unknown convertor!")
+
+	fn, exists := castFuncMap[convertorName]
+	if !exists {
+		logger.Logger.Error(utils.LogServiceName + "[CastTypes]unknown convertor: " + convertorName)
 		return nil
 	}
+
+	result, err := fn(data)
+	if err != nil {
+		logger.Logger.Error(utils.LogServiceName + "[CastTypes-" + convertorName + "]Data conversion failed! Reason for error: " + err.Error())
+		return nil
+	}
+	return result
 }
 
 // CastTypesDefaultValue data type default value

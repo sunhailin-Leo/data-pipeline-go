@@ -27,3 +27,4 @@
     * [MySQL](sink/mysql)
     * [Pulsar](sink/pulsar)
     * [Elasticsearch](sink/elasticsearch)
+    * [Console](sink/console)

@@ -14,7 +14,7 @@ ifeq ($(OS_NAME), Windows_NT)
 	CMD_SUFFIX = .exe
 	CMD_AND = ;
 	BUILD_ARGS := set CGO_ENABLED=${CGO}; set GOOS=${TARGET_OS}; set GOARCH=${TARGET_ARCH}
-	CLEAN_CMD := Remove-Item -Path ${BUILD_DIR}/${OUTPUT_BIN}${CMD_SUFFIX}
+	CLEAN_CMD := Remove-Item -Path ${BUILD_DIR}/${OUTPUT_BIN}${CMD_SUFFIX}; Remove-Item -Path coverage.out -ErrorAction SilentlyContinue; Remove-Item -Path coverage.html -ErrorAction SilentlyContinue
 else
 	OS_NAME=$(shell uname)
 	CHCP_CMD :=
@@ -24,7 +24,7 @@ else
 	CMD_SUFFIX =
 	CMD_AND = &&
 	BUILD_ARGS := export CGO_ENABLED=${CGO} GOOS=${TARGET_OS} GOARCH=${TARGET_ARCH}
-	CLEAN_CMD := rm -f ${BUILD_DIR}/${OUTPUT_BIN}${CMD_SUFFIX}
+	CLEAN_CMD := rm -f ${BUILD_DIR}/${OUTPUT_BIN}${CMD_SUFFIX} coverage.out coverage.html
 endif
 
 # Define golangci-lint
@@ -83,3 +83,29 @@ build:
 clean:
 	@$(CHCP_CMD)
 	${CMD_PREFIX} ${CLEAN_CMD}
+
+.PHONY: fmt
+fmt:
+	@$(CHCP_CMD)
+	gofmt -s -w .
+
+.PHONY: docker-build
+docker-build:
+	@$(CHCP_CMD)
+	docker build -t data-pipeline-go .
+
+.PHONY: docker-run
+docker-run:
+	@$(CHCP_CMD)
+	docker run --rm data-pipeline-go
+
+.PHONY: coverage
+coverage:
+	@$(CHCP_CMD)
+	go test -v -coverprofile=coverage.out -covermode=atomic ./...
+	go tool cover -html=coverage.out -o coverage.html
+
+.PHONY: benchmark
+benchmark:
+	@$(CHCP_CMD)
+	go test -bench=. -benchmem -run=^$$ ./pkg/utils/... ./pkg/transform/convert/... ./pkg/middlewares/...

@@ -30,6 +30,13 @@ type TransformSchema struct {
 	SinkName     string `json:"sink_name" vd:"len($)>0 || (IsIgnore)$ == true"` // sink alias name
 }
 
+// TransformFilter transform filter config for row-level data filtering
+type TransformFilter struct {
+	Field    string `json:"field"`    // field name to filter on
+	Operator string `json:"operator"` // operator: eq, neq, gt, gte, lt, lte, contains, not_contains, regex, in, not_in
+	Value    any    `json:"value"`    // value to compare against
+}
+
 // TransformJsonPath transform json path config
 type TransformJsonPath struct {
 	SrcField  string `json:"src_field"`  // source field
@@ -43,6 +50,7 @@ type TransformConfig struct {
 	Schemas      []TransformSchema   `json:"schemas"`            // Schema
 	RowSeparator string              `json:"row_separator"`      // only mode is row will affect, and also only row mode will use strings.Split to split
 	Paths        []TransformJsonPath `json:"paths"`              // json paths
+	Filters      []TransformFilter   `json:"filters"`            // row-level data filters, only rows matching ALL filters will pass through
 }
 
 // SinkConfig Sink config

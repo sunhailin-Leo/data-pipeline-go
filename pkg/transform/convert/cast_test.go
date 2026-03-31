@@ -165,6 +165,76 @@ func TestCastTypes(t *testing.T) {
 			ConvertorName: "toBool",
 			Expected:      true,
 		},
+		{
+			Data:          "456",
+			ConvertorName: "toInt32",
+			Expected:      int32(456),
+		},
+		{
+			Data:          "789",
+			ConvertorName: "toInt16",
+			Expected:      int16(789),
+		},
+		{
+			Data:          "123",
+			ConvertorName: "toInt8",
+			Expected:      int8(123),
+		},
+		{
+			Data:          "999",
+			ConvertorName: "toInt",
+			Expected:      999,
+		},
+		{
+			Data:          "1000",
+			ConvertorName: "toUint",
+			Expected:      uint(1000),
+		},
+		{
+			Data:          "2000",
+			ConvertorName: "toUint64",
+			Expected:      uint64(2000),
+		},
+		{
+			Data:          "3000",
+			ConvertorName: "toUint32",
+			Expected:      uint32(3000),
+		},
+		{
+			Data:          "4000",
+			ConvertorName: "toUint16",
+			Expected:      uint16(4000),
+		},
+		{
+			Data:          "200",
+			ConvertorName: "toUint8",
+			Expected:      uint8(200),
+		},
+		{
+			Data:          "hello",
+			ConvertorName: "toString",
+			Expected:      "hello",
+		},
+		{
+			Data:          123,
+			ConvertorName: "toString",
+			Expected:      "123",
+		},
+		{
+			Data:          "hello",
+			ConvertorName: "",
+			Expected:      "hello",
+		},
+		{
+			Data:          "invalid",
+			ConvertorName: "toInt",
+			Expected:      nil,
+		},
+		{
+			Data:          "test",
+			ConvertorName: "unknown",
+			Expected:      nil,
+		},
 	}
 
 	for _, unit := range testUnits {
@@ -291,4 +361,76 @@ func TestJsonPathQueriesToMap2(t *testing.T) {
 	assert.Equal(t, 2, len(result))
 	assert.Equal(t, []interface{}{"Nigel Rees", "Evelyn Waugh", "Herman Melville", "J. R. R. Tolkien"}, result["author"])
 	assert.Equal(t, []interface{}{22.99}, result["price"])
+}
+
+// Benchmark functions
+func BenchmarkCastTypes(b *testing.B) {
+	initLogger()
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		CastTypes("123", "toInt64")
+	}
+}
+
+func BenchmarkJsonToMap(b *testing.B) {
+	b.ReportAllocs()
+	data := []byte(`{"name": "test", "age": 25, "active": true}`)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		JsonToMap(data)
+	}
+}
+
+func BenchmarkMapToJson(b *testing.B) {
+	b.ReportAllocs()
+	data := map[string]any{"name": "test", "age": 25, "active": true}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		MapToJson(data)
+	}
+}
+
+func BenchmarkCastTypesDefaultValue(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		CastTypesDefaultValue("toInt64")
+	}
+}
+
+func BenchmarkJsonPathToMap(b *testing.B) {
+	initLogger()
+	b.ReportAllocs()
+	data := []byte(`{"key1": "value1", "key2": "value2", "key3": "value3"}`)
+	paths := []config.TransformJsonPath{
+		{SrcField: "", Path: "key1", DestField: "destKey1"},
+		{SrcField: "", Path: "key2", DestField: "destKey2"},
+		{SrcField: "", Path: "key3", DestField: "destKey3"},
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		JsonPathToMap(data, paths)
+	}
+}
+
+func TestJsonToMap_InvalidJson(t *testing.T) {
+	initLogger()
+	data := []byte(`invalid json`)
+	result := JsonToMap(data)
+	assert.Nil(t, result)
+}
+
+func TestMapToJson_Success(t *testing.T) {
+	data := map[string]any{"name": "test", "age": 25}
+	result := MapToJson(data)
+	assert.NotNil(t, result)
+	assert.NotEmpty(t, result)
+}
+
+func TestMapToJson_Error(t *testing.T) {
+	// Test with function value which cannot be marshaled by sonic
+	data := map[string]any{"func": func() {}}
+	result := MapToJson(data)
+	assert.Nil(t, result)
 }

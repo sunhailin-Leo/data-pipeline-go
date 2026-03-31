@@ -1,0 +1,56 @@
+version: "2"
+
+run:
+  timeout: 5m
+  go: "1.24.13"
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+    - typecheck
+    - bodyclose
+    - gocritic
+    - gofmt
+    - goimports
+    - misspell
+    - nolintlint
+    - prealloc
+
+linters-settings:
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+  govet:
+    enable-shadow: true
+  misspell:
+    locale: US
+  errcheck:
+    exclude-functions:
+      - (fmt.*).*
+
+issues:
+  exclude-dirs:
+    - vendor
+    - .idea
+    - docs
+    - .github
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+  max-issues-per-linter: 50
+  max-same-issues: 10
+
+output:
+  formats:
+    - format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true

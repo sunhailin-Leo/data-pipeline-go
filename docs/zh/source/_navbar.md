@@ -1,3 +1,4 @@
 - [主页](/)
 - Language
+  - [English](/en/)
   - [中文](/zh/)

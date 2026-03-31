@@ -46,3 +46,6 @@ SinkName：标识 Sink 的名称，用于区分不同的 Sink 实例，便于管
 
 * [Elasticsearch](./sink/elasticsearch)
   * 将数据写入 Elasticsearch，适合实时搜索和分析。
+
+* Console
+  * 将数据输出到控制台（标准输出），适合调试和开发阶段使用。

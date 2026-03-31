@@ -34,11 +34,11 @@ func (k *KafkaSourceHandler) SourceTopic() string { return k.sourceTopic }
 // FetchData fetches data from Kafka
 func (k *KafkaSourceHandler) FetchData() {
 	logger.Logger.Info(utils.LogServiceName +
-		"[Kafka-Source][Current config: " + k.SourceAliasName + "]开始消费数据...")
+		"[Kafka-Source][Current config: " + k.SourceAliasName + "]Starting to consume data...")
 	for {
 		if k.kafkaClient == nil {
 			logger.Logger.Fatal(utils.LogServiceName +
-				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka client 已关闭或未配置!")
+				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka client is closed or not configured!")
 			return
 		}
 		// PollFetches 会阻塞直到有数据到达
@@ -48,7 +48,7 @@ func (k *KafkaSourceHandler) FetchData() {
 		}
 		fetches.EachError(func(s string, i int32, err error) {
 			logger.Logger.Fatal(utils.LogServiceName +
-				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka 消费异常! 错误原因: " +
+				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka consume error! Error reason: " +
 				"fetch err topic " + s + " partition " + string(i) + " err " + err.Error())
 		})
 		fetches.EachRecord(func(record *kgo.Record) {
@@ -56,10 +56,10 @@ func (k *KafkaSourceHandler) FetchData() {
 			k.Metrics.OnSourceInputSuccess(k.StreamName, k.SourceAliasName)
 			if k.DebugMode || k.GetToTransformChan() == nil {
 				logger.Logger.Info(utils.LogServiceName +
-					"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka 消费数据: " + string(record.Value))
+					"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka consume data: " + string(record.Value))
 			} else {
 				logger.Logger.Debug(utils.LogServiceName +
-					"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka 消费数据: " + string(record.Value))
+					"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka consume data: " + string(record.Value))
 				// 往 Transform 管道写数据
 				k.GetToTransformChan() <- &models.SourceOutput{
 					MetaData:   k.MetaData,
@@ -134,6 +134,6 @@ func NewKafkaSource(baseSource source.BaseSource) *KafkaSourceHandler {
 	handler.InitSource()
 	handler.SetToTransformChan()
 	logger.Logger.Info(utils.LogServiceName +
-		"[Kafka-Source][Current config: " + baseSource.SourceConfig.SourceName + "]Kafka 初始化成功!")
+		"[Kafka-Source][Current config: " + baseSource.SourceConfig.SourceName + "]Kafka initialized successfully!")
 	return handler
 }

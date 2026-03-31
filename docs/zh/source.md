@@ -14,6 +14,16 @@ Source
 - [X] RabbitMQ
 - [X] Prometheus metrics exporter(etc. get /metrics)
 
+## ACK 模式
+
+在 Stream 配置中，`ack_mode` 字段控制消息的确认时机，仅对 MQ 类 Source（Kafka、RocketMQ、RabbitMQ、Pulsar）生效：
+
+| 值 | 模式 | 说明 |
+|----|------|------|
+| `0` | 消费后确认 | 消息从 Source 消费后立即确认（默认） |
+| `1` | 转换后确认 | 消息经过 Transform 处理后确认 |
+| `2` | 写入后确认 | 消息成功写入 Sink 后确认（最安全） |
+
 ## 字段说明
 **example:**
 ```json

@@ -72,6 +72,128 @@ func TestRowMode(t *testing.T) {
 				},
 			},
 		},
+		{
+			InputData: &models.TransformBeforeConvert{
+				SourceOutput:      &models.SourceOutput{},
+				BeforeConvertData: "1,2,3",
+			},
+			Config: config.TransformConfig{
+				Mode: "row",
+				Schemas: []config.TransformSchema{
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+				},
+				RowSeparator: ",",
+			},
+			Expected: &models.TransformAfterConvert{
+				SourceOutput: &models.SourceOutput{},
+				AfterConvertData: map[string][]any{
+					"Clickhouse-1": {1, 2},
+				},
+			},
+		},
+		{
+			InputData: &models.TransformBeforeConvert{
+				SourceOutput:      &models.SourceOutput{},
+				BeforeConvertData: "1,2,3",
+			},
+			Config: config.TransformConfig{
+				Mode: "row",
+				Schemas: []config.TransformSchema{
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+				},
+				RowSeparator: ",",
+			},
+			Expected: &models.TransformAfterConvert{
+				SourceOutput: &models.SourceOutput{},
+				AfterConvertData: map[string][]any{
+					"Clickhouse-1": {1, 2, 3},
+				},
+			},
+		},
+		{
+			InputData: &models.TransformBeforeConvert{
+				SourceOutput:      &models.SourceOutput{},
+				BeforeConvertData: "123|456|789",
+			},
+			Config: config.TransformConfig{
+				Mode: "row",
+				Schemas: []config.TransformSchema{
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+					{
+						Converter:  "toInt",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+				},
+				RowSeparator: "|",
+			},
+			Expected: &models.TransformAfterConvert{
+				SourceOutput: &models.SourceOutput{},
+				AfterConvertData: map[string][]any{
+					"Clickhouse-1": {123, 456, 789},
+				},
+			},
+		},
+		{
+			InputData: &models.TransformBeforeConvert{
+				SourceOutput:      &models.SourceOutput{},
+				BeforeConvertData: "123",
+			},
+			Config: config.TransformConfig{
+				Mode: "row",
+				Schemas: []config.TransformSchema{
+					{
+						Converter:  "toString",
+						SourceName: "Kafka-1",
+						SinkName:   "Clickhouse-1",
+					},
+				},
+				RowSeparator: ",",
+			},
+			Expected: &models.TransformAfterConvert{
+				SourceOutput: &models.SourceOutput{},
+				AfterConvertData: map[string][]any{
+					"Clickhouse-1": {"123"},
+				},
+			},
+		},
 	}
 
 	for _, unit := range testUnits {
@@ -79,5 +201,38 @@ func TestRowMode(t *testing.T) {
 		if !reflect.DeepEqual(actual.AfterConvertData, unit.Expected.AfterConvertData) {
 			t.Fatalf("TestRowMode failed. Expected: %v, actual: %v", unit.Expected.AfterConvertData, actual.AfterConvertData)
 		}
+	}
+}
+
+// Benchmark functions
+func BenchmarkRowMode(b *testing.B) {
+	initLogger()
+	b.ReportAllocs()
+
+	inputData := &models.TransformBeforeConvert{
+		SourceOutput:      &models.SourceOutput{},
+		BeforeConvertData: "123,abc",
+	}
+
+	config := config.TransformConfig{
+		Mode: "row",
+		Schemas: []config.TransformSchema{
+			{
+				Converter:  "toInt",
+				SourceName: "Kafka-1",
+				SinkName:   "Clickhouse-1,Clickhouse-2",
+			},
+			{
+				Converter:  "toString",
+				SourceName: "Kafka-1",
+				SinkName:   "Clickhouse-1,Clickhouse-2",
+			},
+		},
+		RowSeparator: ",",
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		RowMode(inputData, config)
 	}
 }

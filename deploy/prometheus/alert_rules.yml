@@ -1,0 +1,93 @@
+groups:
+  - name: data_pipeline_alerts
+    interval: 30s
+    rules:
+      # Source Error Rate Alert
+      - alert: HighSourceErrorRate
+        expr: |
+          sum by(stream_id, source_id) (
+            rate(data_source_input_total[5m]) - rate(data_source_input_success_total[5m])
+          ) / sum by(stream_id, source_id) (rate(data_source_input_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: source
+        annotations:
+          summary: "High error rate detected in Source (stream {{ $labels.stream_id }}, source {{ $labels.source_id }})"
+          description: "Source error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      # Sink Error Rate Alert
+      - alert: HighSinkErrorRate
+        expr: |
+          sum by(stream_id, sink_id) (
+            rate(data_sink_input_total[5m]) - rate(data_sink_input_success_total[5m])
+          ) / sum by(stream_id, sink_id) (rate(data_sink_input_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: sink
+        annotations:
+          summary: "High error rate detected in Sink (stream {{ $labels.stream_id }}, sink {{ $labels.sink_id }})"
+          description: "Sink error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      # Transform Error Rate Alert
+      - alert: HighTransformErrorRate
+        expr: |
+          sum by(stream_id) (
+            rate(data_transform_input_total[5m]) - rate(data_transform_input_success_total[5m])
+          ) / sum by(stream_id) (rate(data_transform_input_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: transform
+        annotations:
+          summary: "High error rate detected in Transform (stream {{ $labels.stream_id }})"
+          description: "Transform error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      # No Data From Source Alert
+      - alert: NoDataFromSource
+        expr: |
+          sum by(stream_id, source_id) (increase(data_source_input_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: source
+        annotations:
+          summary: "No data received from Source (stream {{ $labels.stream_id }}, source {{ $labels.source_id }})"
+          description: "No new data has been received from source for the last 5 minutes"
+
+      # Sink Write Stalled Alert
+      - alert: SinkWriteStalled
+        expr: |
+          sum by(stream_id, sink_id) (increase(data_sink_output_success_total[5m])) == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: sink
+        annotations:
+          summary: "Sink write stalled (stream {{ $labels.stream_id }}, sink {{ $labels.sink_id }})"
+          description: "Sink has not successfully written any data for the last 5 minutes"
+
+      # High Process Memory Alert
+      - alert: HighProcessMemory
+        expr: |
+          go_memstats_alloc_bytes > 1073741824
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High process memory usage detected"
+          description: "Process memory usage is {{ $value | humanize1024 }}B (threshold: 1GB)"
+
+      # High Goroutine Count Alert
+      - alert: HighGoroutineCount
+        expr: |
+          go_goroutines > 1000
+        for: 10m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High goroutine count detected"
+          description: "Current goroutine count is {{ $value }} (threshold: 1000)"

@@ -23,8 +23,11 @@ func InterfaceSliceToStringSlice(slice []any) []string {
 
 // StringSliceToMap string slice to map
 func StringSliceToMap(keys []string, value []any) map[string]any {
-	result := make(map[string]any)
+	result := make(map[string]any, len(keys))
 	for i, key := range keys {
+		if i >= len(value) {
+			break
+		}
 		result[key] = value[i]
 	}
 	return result

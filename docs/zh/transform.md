@@ -5,7 +5,7 @@ Transform
 
 | 字段名            | 类型                    | 必填 | 说明                                                 |
 |----------------|-----------------------|----|----------------------------------------------------|
-| `Mode`         | `string`              | 是  | 转换模式：`row`（按行分隔）或 `json`（按 JSON 格式）                |
+| `Mode`         | `string`              | 是  | 转换模式：`row`（按行分隔）、`json`（按 JSON 格式）或 `jsonPath`（按 JSONPath 提取） |
 | `Schemas`      | `[]TransformSchema`   | 否  | 字段映射的配置列表，包含字段转换、别名、转换器等配置                         |
 | `RowSeparator` | `string`              | 否  | 行分隔符，仅在 `Mode` 为 `row` 时使用，使用 `strings.Split` 进行分隔 |
 | `Paths`        | `[]TransformJsonPath` | 否  | JSON 路径配置列表，仅在 `Mode` 为 `json` 时使用                 |

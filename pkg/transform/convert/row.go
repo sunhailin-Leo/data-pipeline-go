@@ -19,7 +19,11 @@ func RowMode(beforeConvertData *models.TransformBeforeConvert, transformConfig c
 		return afterConvertData
 	}
 
-	for i, value := range strings.Split(beforeConvertData.BeforeConvertData.(string), transformConfig.RowSeparator) {
+	splitValues := strings.Split(beforeConvertData.BeforeConvertData.(string), transformConfig.RowSeparator)
+	for i, value := range splitValues {
+		if i >= len(transformConfig.Schemas) {
+			break
+		}
 		generateConvertResultData(transformConfig.Schemas[i].SinkName, resultData,
 			CastTypes(value, transformConfig.Schemas[i].Converter))
 	}

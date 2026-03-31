@@ -16,12 +16,17 @@ func TestParse(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		"with dashes":        {uuid: "53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
-		"no dashes":          {uuid: "53bfe55041654f81a8e7c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
-		"urn:uuid prefix":    {uuid: "urn:uuid:53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
-		"uppercase":          {uuid: "53BFE550-4165-4F81-A8E7-C2609579CCC0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
-		"mixed case":         {uuid: "53bfe550-4165-4f81-A8E7-C2609579CCC0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
-		"invalid urn prefix": {uuid: "abc:1234:53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "00000000-0000-0000-0000-000000000000", wantErr: true},
+		"with dashes":         {uuid: "53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
+		"no dashes":           {uuid: "53bfe55041654f81a8e7c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
+		"urn:uuid prefix":     {uuid: "urn:uuid:53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
+		"uppercase":           {uuid: "53BFE550-4165-4F81-A8E7-C2609579CCC0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
+		"mixed case":          {uuid: "53bfe550-4165-4f81-A8E7-C2609579CCC0", want: "53bfe550-4165-4f81-a8e7-c2609579ccc0"},
+		"invalid urn prefix":  {uuid: "abc:1234:53bfe550-4165-4f81-a8e7-c2609579ccc0", want: "00000000-0000-0000-0000-000000000000", wantErr: true},
+		"invalid length":      {uuid: "abc", wantErr: true},
+		"invalid format 36":   {uuid: "53bfe550X4165-4f81-a8e7-c2609579ccc0", wantErr: true},
+		"invalid hex":         {uuid: "ZZZZZZZZ-ZZZZ-ZZZZ-ZZZZ-ZZZZZZZZZZZZ", wantErr: true},
+		"unsupported version": {uuid: "53bfe550-4165-1f81-a8e7-c2609579ccc0", wantErr: true},
+		"unsupported variant": {uuid: "53bfe550-4165-4f81-08e7-c2609579ccc0", wantErr: true},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -30,7 +35,7 @@ func TestParse(t *testing.T) {
 				t.Errorf("Parse() wantErr = %t, gotErr = %v", tt.wantErr, err)
 				return
 			}
-			if uuid.String() != tt.want {
+			if !tt.wantErr && uuid.String() != tt.want {
 				t.Errorf("want = %s, got = %s", tt.want, uuid.String())
 			}
 		})
@@ -108,4 +113,95 @@ func TestPrint(t *testing.T) {
 
 	u, _ = NewV7()
 	t.Logf("v7: %s %v", u, u[:])
+}
+
+// Benchmark functions
+func BenchmarkNewV4(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		NewV4()
+	}
+}
+
+func BenchmarkNewV7(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		NewV7()
+	}
+}
+
+func BenchmarkUUIDString(b *testing.B) {
+	b.ReportAllocs()
+	u, _ := NewV4()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		u.String()
+	}
+}
+
+func BenchmarkUUIDStringWithoutDash(b *testing.B) {
+	b.ReportAllocs()
+	u, _ := NewV4()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		u.StringWithoutDash()
+	}
+}
+
+func BenchmarkGetUUID(b *testing.B) {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		GetUUID()
+	}
+}
+
+func BenchmarkParse(b *testing.B) {
+	b.ReportAllocs()
+	uuidStr := "53bfe550-4165-4f81-a8e7-c2609579ccc0"
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		Parse(uuidStr)
+	}
+}
+
+func TestStringWithoutDash(t *testing.T) {
+	tests := map[string]struct {
+		new func() (UUID, error)
+	}{
+		"nil": {new: func() (UUID, error) {
+			return Nil, nil
+		}},
+		"version 4": {new: NewV4},
+		"version 7": {new: NewV7},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			u, _ := tt.new()
+			result := u.StringWithoutDash()
+			if len(result) != 32 {
+				t.Errorf("StringWithoutDash() length = %d, want 32", len(result))
+			}
+			for _, c := range result {
+				if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+					t.Errorf("StringWithoutDash() contains invalid character: %c", c)
+				}
+			}
+		})
+	}
+}
+
+func TestGetUUID(t *testing.T) {
+	uuid := GetUUID()
+	if len(uuid) != 32 {
+		t.Errorf("GetUUID() length = %d, want 32", len(uuid))
+	}
+	for _, c := range uuid {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+			t.Errorf("GetUUID() contains invalid character: %c", c)
+		}
+	}
 }

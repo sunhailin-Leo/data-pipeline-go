@@ -61,3 +61,13 @@
     - [X] HTTP-Get
 - [X] Prometheus
 - [X] pprof
+
+---
+
+## Future Plans:
+
+- [ ] Configuration hot reload (live reload)
+- [X] Multi-source input support
+- [X] Data filtering Transform plugin
+- [X] Monitoring and alerting integration
+- [X] Performance benchmarking suite

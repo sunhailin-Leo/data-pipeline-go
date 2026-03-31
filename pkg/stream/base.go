@@ -2,6 +2,7 @@ package stream
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/panjf2000/ants/v2"
 
@@ -28,6 +29,8 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/transform"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
+
+const transformStageCount = 3
 
 type Stream interface {
 	GetSource(streamConfig *config.StreamConfig) map[string]chan *models.SourceOutput
@@ -67,7 +70,7 @@ func (b *BaseStream) setupWorkPool() {
 		if streamConfig.Enable {
 			poolCnt += len(streamConfig.Sink)
 			poolCnt += len(streamConfig.Source)
-			poolCnt += 3 // transform[From -> Convert -> To]
+			poolCnt += transformStageCount // transform[From -> Convert -> To]
 		}
 	}
 	streamWorkPool, createWorkPoolErr := ants.NewPool(poolCnt, ants.WithPreAlloc(true))
@@ -80,6 +83,31 @@ func (b *BaseStream) setupWorkPool() {
 // releaseWorkPool release goroutine worker pool
 func (b *BaseStream) releaseWorkPool() {
 	b.streamWorkPool.Release()
+}
+
+// mergeSourceChannels merges multiple source channels into a single channel (fan-in pattern)
+func (b *BaseStream) mergeSourceChannels(sourceChanMap map[string]chan *models.SourceOutput, chanSize int) chan *models.SourceOutput {
+	mergedChan := make(chan *models.SourceOutput, chanSize)
+
+	var wg sync.WaitGroup
+	for sourceName, sourceChan := range sourceChanMap {
+		wg.Add(1)
+		go func(name string, ch chan *models.SourceOutput) {
+			defer wg.Done()
+			for data := range ch {
+				mergedChan <- data
+			}
+			logger.Logger.Info(utils.LogServiceName + "[Stream-Merge]Source " + name + " channel closed")
+		}(sourceName, sourceChan)
+	}
+
+	go func() {
+		wg.Wait()
+		close(mergedChan)
+		logger.Logger.Info(utils.LogServiceName + "[Stream-Merge]All source channels merged and closed")
+	}()
+
+	return mergedChan
 }
 
 // closeSource close all source channel

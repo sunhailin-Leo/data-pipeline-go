@@ -43,23 +43,37 @@ func (t *Handler) sourceDataSelector(sourceData *models.SourceOutput) any {
 func (t *Handler) sourceTransformModeSelector(sourceData *models.SourceOutput) *models.TransformBeforeConvert {
 	switch t.configs.Mode {
 	case utils.TransformRowMode:
+		// row mode does not support filtering as data is not key-value structure
+		if len(t.configs.Filters) > 0 {
+			logger.Logger.Warn(utils.LogServiceName + "[Transform-Filter]filters are configured but row mode does not support filtering, filters will be ignored")
+		}
 		return &models.TransformBeforeConvert{
 			SourceOutput:      sourceData,
 			BeforeConvertData: t.sourceDataSelector(sourceData),
 		}
 	case utils.TransformJsonMode:
+		parsedData := convert.JsonToMap(t.sourceDataSelector(sourceData).([]byte))
+		// Apply row-level filters
+		if len(t.configs.Filters) > 0 && !convert.MatchFilters(parsedData, t.configs.Filters) {
+			return nil
+		}
 		return &models.TransformBeforeConvert{
 			SourceOutput:      sourceData,
-			BeforeConvertData: convert.JsonToMap(t.sourceDataSelector(sourceData).([]byte)),
+			BeforeConvertData: parsedData,
 		}
 	case utils.TransformJsonPathMode:
 		if t.configs.Paths == nil {
 			logger.Logger.Fatal(utils.LogServiceName + "[Transform-From]JsonPath paths not config!")
 			return nil
 		}
+		parsedData := convert.JsonPathToMap(t.sourceDataSelector(sourceData).([]byte), t.configs.Paths)
+		// Apply row-level filters
+		if len(t.configs.Filters) > 0 && !convert.MatchFilters(parsedData, t.configs.Filters) {
+			return nil
+		}
 		return &models.TransformBeforeConvert{
 			SourceOutput:      sourceData,
-			BeforeConvertData: convert.JsonPathToMap(t.sourceDataSelector(sourceData).([]byte), t.configs.Paths),
+			BeforeConvertData: parsedData,
 		}
 
 	default:
