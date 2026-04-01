@@ -23,7 +23,7 @@ func TestRenderClickhouseCreateTableTemplate(t *testing.T) {
 		Settings:   []string{"storage_policy = 'policy_data8'"},
 	}
 
-	template, err := RenderClickhouseCreateTableTemplate("autoCreateTable", sinkConfig)
+	template, err := RenderClickhouseCreateTableTemplate("autoCreateTable", &sinkConfig)
 	if err != nil {
 		panic(err)
 	}

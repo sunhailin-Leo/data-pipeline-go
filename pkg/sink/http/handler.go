@@ -67,7 +67,7 @@ func (h *HTTPSinkHandler) WriteData() {
 	for {
 		if h.httpClient == nil {
 			logger.Logger.Error(utils.LogServiceName +
-				"[HTTP-Sink][Current config: " + h.SinkAliasName + "]HTTP client not initialised or closed!")
+				"[HTTP-Sink][Current config: " + h.SinkAliasName + "]HTTP client not initialized or closed!")
 			return
 		}
 

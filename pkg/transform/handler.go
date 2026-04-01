@@ -107,7 +107,7 @@ func (t *Handler) From() {
 func (t *Handler) ConvertModeSelector(beforeConvertData *models.TransformBeforeConvert) *models.TransformAfterConvert {
 	switch t.configs.Mode {
 	case utils.TransformRowMode:
-		return convert.RowMode(beforeConvertData, t.configs)
+		return convert.RowMode(beforeConvertData, &t.configs)
 	case utils.TransformJsonMode, utils.TransformJsonPathMode:
 		/*
 			Json Mode:
@@ -209,7 +209,7 @@ func (t *Handler) To() {
 }
 
 // InitTransform init transform module
-func (t *Handler) InitTransform(transformConfig config.TransformConfig, chanSize int) Transform {
+func (t *Handler) InitTransform(transformConfig *config.TransformConfig, chanSize int) Transform {
 	t.BaseTransform.InitTransform(transformConfig, chanSize)
 	logger.Logger.Info(utils.LogServiceName + "Transform initialize successful!")
 	return t

@@ -156,14 +156,14 @@ func (r *RocketMQSourceHandler) CloseSource() {
 }
 
 // NewRocketMQSource initializes a new RocketMQ source handler
-func NewRocketMQSource(baseSource source.BaseSource) *RocketMQSourceHandler {
+func NewRocketMQSource(baseSource *source.BaseSource) *RocketMQSourceHandler {
 	sourceGroup := baseSource.SourceConfig.RocketMQ.Group
 	if sourceGroup == "" {
 		sourceGroup = utils.ServiceName
 	}
 
 	handler := &RocketMQSourceHandler{
-		BaseSource:    baseSource,
+		BaseSource:    *baseSource,
 		sourceAddress: baseSource.SourceConfig.RocketMQ.Address,
 		sourceTopic:   baseSource.SourceConfig.RocketMQ.Topic,
 		sourceGroup:   sourceGroup,

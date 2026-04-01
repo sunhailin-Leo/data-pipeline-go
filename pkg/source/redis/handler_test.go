@@ -47,7 +47,7 @@ func TestNewRedisSourceHandler(t *testing.T) {
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
-	r := NewRedisSourceHandler(baseSource)
+	r := NewRedisSourceHandler(&baseSource)
 	c := r.GetToTransformChan()
 
 	var wg sync.WaitGroup

@@ -12,7 +12,7 @@ import (
 )
 
 // SetKV writes key-value data to Redis
-func SetKV(client redis.UniversalClient, loggerName string, key string, value any, ex int) bool {
+func SetKV(client redis.UniversalClient, loggerName, key string, value any, ex int) bool {
 	keyTTL := time.Duration(-1)
 	if ex > 0 {
 		keyTTL = time.Duration(ex) * time.Second
@@ -28,7 +28,7 @@ func SetKV(client redis.UniversalClient, loggerName string, key string, value an
 }
 
 // HashSet writes hash data to Redis
-func HashSet(client redis.UniversalClient, loggerName string, key string, values []any) bool {
+func HashSet(client redis.UniversalClient, loggerName, key string, values []any) bool {
 	_, setErr := client.HSet(context.Background(), key, values...).Result()
 	if setErr != nil && !errors.Is(setErr, NilType) {
 		logger.Logger.Error(utils.LogServiceName +
@@ -39,7 +39,7 @@ func HashSet(client redis.UniversalClient, loggerName string, key string, values
 }
 
 // ListLPush writes list data to Redis
-func ListLPush(client redis.UniversalClient, loggerName string, key string, values []any) bool {
+func ListLPush(client redis.UniversalClient, loggerName, key string, values []any) bool {
 	_, setErr := client.LPush(context.Background(), key, values...).Result()
 	if setErr != nil && !errors.Is(setErr, NilType) {
 		logger.Logger.Error(utils.LogServiceName +
@@ -50,7 +50,7 @@ func ListLPush(client redis.UniversalClient, loggerName string, key string, valu
 }
 
 // ListRPush writes list data to Redis
-func ListRPush(client redis.UniversalClient, loggerName string, key string, values []any) bool {
+func ListRPush(client redis.UniversalClient, loggerName, key string, values []any) bool {
 	_, setErr := client.RPush(context.Background(), key, values...).Result()
 	if setErr != nil && !errors.Is(setErr, NilType) {
 		logger.Logger.Error(utils.LogServiceName +
@@ -61,7 +61,7 @@ func ListRPush(client redis.UniversalClient, loggerName string, key string, valu
 }
 
 // SetSAdd writes set data to Redis
-func SetSAdd(client redis.UniversalClient, loggerName string, key string, values []any) bool {
+func SetSAdd(client redis.UniversalClient, loggerName, key string, values []any) bool {
 	_, setErr := client.SAdd(context.Background(), key, values...).Result()
 	if setErr != nil && !errors.Is(setErr, NilType) {
 		logger.Logger.Error(utils.LogServiceName +
@@ -72,7 +72,7 @@ func SetSAdd(client redis.UniversalClient, loggerName string, key string, values
 }
 
 // Publish writes message to Redis channel
-func Publish(client redis.UniversalClient, loggerName string, channel string, message any) bool {
+func Publish(client redis.UniversalClient, loggerName, channel string, message any) bool {
 	_, setErr := client.Publish(context.Background(), channel, message).Result()
 	if setErr != nil && !errors.Is(setErr, NilType) {
 		logger.Logger.Error(utils.LogServiceName +

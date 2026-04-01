@@ -35,7 +35,7 @@ func TestNewPromMetricSourceHandler(t *testing.T) {
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
 
-	pm := NewPromMetricSourceHandler(baseSource)
+	pm := NewPromMetricSourceHandler(&baseSource)
 	c := pm.GetToTransformChan()
 
 	go pm.FetchData()

@@ -5,7 +5,7 @@ import (
 )
 
 // PopSlice return slice after pop and pop element
-func PopSlice(slice []any) ([]any, any) {
+func PopSlice(slice []any) (remaining []any, popped any) {
 	if len(slice) == 0 {
 		return slice, nil
 	}

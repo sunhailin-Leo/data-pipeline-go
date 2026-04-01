@@ -67,7 +67,7 @@ func TestNewSource(t *testing.T) {
 			Metrics:         metrics,
 		}
 
-		src := NewSource("UnknownType", baseSource)
+		src := NewSource("UnknownType", &baseSource)
 
 		assert.Nil(t, src, "Unknown source type should return nil")
 	})

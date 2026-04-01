@@ -111,9 +111,9 @@ func (p *PulsarSourceHandler) CloseSource() {
 }
 
 // NewPulsarSourceHandler initializes a new Pulsar source handler
-func NewPulsarSourceHandler(baseSource source.BaseSource) *PulsarSourceHandler {
+func NewPulsarSourceHandler(baseSource *source.BaseSource) *PulsarSourceHandler {
 	handler := &PulsarSourceHandler{
-		BaseSource:             baseSource,
+		BaseSource:             *baseSource,
 		sourceAddress:          baseSource.SourceConfig.Pulsar.Address,
 		sourceTopic:            baseSource.SourceConfig.Pulsar.Topic,
 		sourceSubscriptionName: baseSource.SourceConfig.Pulsar.SubscriptionName,

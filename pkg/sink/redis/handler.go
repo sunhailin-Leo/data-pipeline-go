@@ -129,8 +129,8 @@ func (r *RedisSinkHandler) CloseSink() {
 }
 
 // NewRedisSinkHandler creates a new Redis sink handler
-func NewRedisSinkHandler(baseSink sink.BaseSink, sinkRedisCfg config.RedisSinkConfig) *RedisSinkHandler {
-	handler := &RedisSinkHandler{BaseSink: baseSink, sinkRedisCfg: sinkRedisCfg}
+func NewRedisSinkHandler(baseSink sink.BaseSink, sinkRedisCfg *config.RedisSinkConfig) *RedisSinkHandler {
+	handler := &RedisSinkHandler{BaseSink: baseSink, sinkRedisCfg: *sinkRedisCfg}
 	handler.InitSink()
 	handler.SetFromTransformChan()
 	return handler

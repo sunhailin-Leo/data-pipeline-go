@@ -156,9 +156,9 @@ func (r *RedisSourceHandler) CloseSource() {
 }
 
 // NewRedisSourceHandler initializes a new Redis source handler
-func NewRedisSourceHandler(baseSource source.BaseSource) *RedisSourceHandler {
+func NewRedisSourceHandler(baseSource *source.BaseSource) *RedisSourceHandler {
 	handler := &RedisSourceHandler{
-		BaseSource:     baseSource,
+		BaseSource:     *baseSource,
 		sourceRedisCfg: baseSource.SourceConfig.Redis,
 		done:           make(chan struct{}),
 	}

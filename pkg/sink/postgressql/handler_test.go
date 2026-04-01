@@ -76,7 +76,7 @@ func TestNewPostgresSQLHandler(t *testing.T) {
 		BulkSize:  5,
 	}
 
-	pgClient := NewPostgresSQLHandler(base, testPostgresSQLConfig)
+	pgClient := NewPostgresSQLHandler(base, &testPostgresSQLConfig)
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {

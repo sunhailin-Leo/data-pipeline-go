@@ -50,7 +50,7 @@ func TestNewRabbitMQSource(t *testing.T) {
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
-	rmq := NewRabbitMQSource(baseSource)
+	rmq := NewRabbitMQSource(&baseSource)
 	c := rmq.GetToTransformChan()
 
 	// Create publisher connection first to ensure exchange and queue are properly set up

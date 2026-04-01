@@ -197,7 +197,7 @@ func TestRowMode(t *testing.T) {
 	}
 
 	for _, unit := range testUnits {
-		actual := RowMode(unit.InputData, unit.Config)
+		actual := RowMode(unit.InputData, &unit.Config)
 		if !reflect.DeepEqual(actual.AfterConvertData, unit.Expected.AfterConvertData) {
 			t.Fatalf("TestRowMode failed. Expected: %v, actual: %v", unit.Expected.AfterConvertData, actual.AfterConvertData)
 		}
@@ -214,7 +214,7 @@ func BenchmarkRowMode(b *testing.B) {
 		BeforeConvertData: "123,abc",
 	}
 
-	config := config.TransformConfig{
+	transformCfg := config.TransformConfig{
 		Mode: "row",
 		Schemas: []config.TransformSchema{
 			{
@@ -233,6 +233,6 @@ func BenchmarkRowMode(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		RowMode(inputData, config)
+		RowMode(inputData, &transformCfg)
 	}
 }

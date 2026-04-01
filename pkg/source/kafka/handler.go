@@ -121,9 +121,9 @@ func (k *KafkaSourceHandler) CloseSource() {
 }
 
 // NewKafkaSource initializes a new Kafka source handler
-func NewKafkaSource(baseSource source.BaseSource) *KafkaSourceHandler {
+func NewKafkaSource(baseSource *source.BaseSource) *KafkaSourceHandler {
 	handler := &KafkaSourceHandler{
-		BaseSource:    baseSource,
+		BaseSource:    *baseSource,
 		sourceAddress: baseSource.SourceConfig.Kafka.Address,
 		sourceTopic:   baseSource.SourceConfig.Kafka.Topic,
 		sourceGroup:   baseSource.SourceConfig.Kafka.Group,

@@ -8,7 +8,7 @@ import (
 )
 
 // RowMode row mode
-func RowMode(beforeConvertData *models.TransformBeforeConvert, transformConfig config.TransformConfig) *models.TransformAfterConvert {
+func RowMode(beforeConvertData *models.TransformBeforeConvert, transformConfig *config.TransformConfig) *models.TransformAfterConvert {
 	resultData := make(map[string][]any)
 	afterConvertData := &models.TransformAfterConvert{SourceOutput: beforeConvertData.SourceOutput}
 	// If a delimiter is configured, then it will be processed after being sliced according to the delimiter first

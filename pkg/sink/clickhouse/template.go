@@ -14,7 +14,7 @@ import (
 var createTableTmpl string
 
 // RenderClickhouseCreateTableTemplate render clickhouse create table template
-func RenderClickhouseCreateTableTemplate(templateName string, data config.ClickhouseSinkConfig) (string, error) {
+func RenderClickhouseCreateTableTemplate(templateName string, data *config.ClickhouseSinkConfig) (string, error) {
 	var result bytes.Buffer
 	funcMap := template.FuncMap{
 		"sub":      func(a, b int) int { return a - b },

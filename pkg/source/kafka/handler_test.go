@@ -60,7 +60,7 @@ func TestNewKafkaSource(t *testing.T) {
 			},
 		},
 	}
-	kafka := NewKafkaSource(baseSource)
+	kafka := NewKafkaSource(&baseSource)
 	c := kafka.GetToTransformChan()
 
 	// Start consumer

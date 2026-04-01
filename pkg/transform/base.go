@@ -11,7 +11,7 @@ type Transform interface {
 	Convert() // convert/transform data
 	To()      // write data to sink
 
-	InitTransform(transformConfig config.TransformConfig, chanSize int) Transform                       // init transform module
+	InitTransform(transformConfig *config.TransformConfig, chanSize int) Transform                      // init transform module
 	ConvertModeSelector(beforeConvertData *models.TransformBeforeConvert) *models.TransformAfterConvert // Convert
 	CloseTransform()                                                                                    // close transform module
 
@@ -48,8 +48,8 @@ func (b *BaseTransform) To() {
 	panic("implement To")
 }
 
-func (b *BaseTransform) InitTransform(configs config.TransformConfig, chanSize int) Transform {
-	b.configs = configs
+func (b *BaseTransform) InitTransform(configs *config.TransformConfig, chanSize int) Transform {
+	b.configs = *configs
 	b.initChannel(chanSize)
 	return b
 }

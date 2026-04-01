@@ -253,7 +253,7 @@ func (c *TunnelConfigLoader) loadFromRedis() {
 		Password: redisPassword,
 		DB:       redisDBNum,
 	})
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	if pingErr := client.Ping(context.Background()).Err(); pingErr != nil {
 		logger.Logger.Error(utils.LogServiceName + "Failed to connect Redis! Reason for exception: " + pingErr.Error())
 		return
@@ -311,14 +311,15 @@ func (c *TunnelConfigLoader) loadFromNacos() {
 		logger.Logger.Fatal(utils.LogServiceName + "failed to create Nacos client, Reason for exception: " + createClientErr.Error())
 		return
 	}
-	defer configClient.CloseClient()
 
 	nacosDataIdObj := viper.Get(utils.ConfigFromNacosEnvDataId)
 	nacosGroupObj := viper.Get(utils.ConfigFromNacosEnvGroup)
 	if nacosDataIdObj == nil || nacosGroupObj == nil {
 		logger.Logger.Fatal(utils.LogServiceName + "Load Nacos config error, reason: NACOS_DATA_ID or NACOS_GROUP is empty")
+		configClient.CloseClient()
 		os.Exit(1)
 	}
+	defer configClient.CloseClient()
 
 	// get config
 	content, getConfigErr := configClient.GetConfig(vo.ConfigParam{

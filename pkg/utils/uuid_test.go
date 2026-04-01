@@ -137,7 +137,7 @@ func BenchmarkUUIDString(b *testing.B) {
 	u, _ := NewV4()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		u.String()
+		_ = u.String()
 	}
 }
 
@@ -186,7 +186,7 @@ func TestStringWithoutDash(t *testing.T) {
 				t.Errorf("StringWithoutDash() length = %d, want 32", len(result))
 			}
 			for _, c := range result {
-				if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+				if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
 					t.Errorf("StringWithoutDash() contains invalid character: %c", c)
 				}
 			}
@@ -200,7 +200,7 @@ func TestGetUUID(t *testing.T) {
 		t.Errorf("GetUUID() length = %d, want 32", len(uuid))
 	}
 	for _, c := range uuid {
-		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
 			t.Errorf("GetUUID() contains invalid character: %c", c)
 		}
 	}

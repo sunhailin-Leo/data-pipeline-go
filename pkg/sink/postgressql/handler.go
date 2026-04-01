@@ -190,10 +190,10 @@ func (p *PostgresSQLHandler) CloseSink() {
 	}
 }
 
-func NewPostgresSQLHandler(baseSink sink.BaseSink, sinkPostgresSQLCfg config.PostgresSQLSinkConfig) *PostgresSQLHandler {
+func NewPostgresSQLHandler(baseSink sink.BaseSink, sinkPostgresSQLCfg *config.PostgresSQLSinkConfig) *PostgresSQLHandler {
 	handler := &PostgresSQLHandler{
 		BaseSink:           baseSink,
-		sinkPostgresSQLCfg: sinkPostgresSQLCfg,
+		sinkPostgresSQLCfg: *sinkPostgresSQLCfg,
 		ticker:             time.NewTicker(time.Duration(defaultFlushTime) * time.Second),
 		done:               make(chan struct{}),
 	}

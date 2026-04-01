@@ -135,9 +135,9 @@ func (p *PromMetricSourceHandler) CloseSource() {
 }
 
 // NewPromMetricSourceHandler initializes a new PromMetrics source handler
-func NewPromMetricSourceHandler(baseSource source.BaseSource) *PromMetricSourceHandler {
+func NewPromMetricSourceHandler(baseSource *source.BaseSource) *PromMetricSourceHandler {
 	handler := &PromMetricSourceHandler{
-		BaseSource:    baseSource,
+		BaseSource:    *baseSource,
 		sourceAddress: baseSource.SourceConfig.PromMetrics.Address,
 		ticker:        time.NewTicker(time.Duration(baseSource.SourceConfig.PromMetrics.Interval) * time.Second),
 	}

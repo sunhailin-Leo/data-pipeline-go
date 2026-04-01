@@ -198,10 +198,10 @@ func (e *ElasticsearchSinkHandler) CloseSink() {
 }
 
 // NewElasticsearchSinkHandler creates a new Elasticsearch sink handler
-func NewElasticsearchSinkHandler(baseSink sink.BaseSink, sinkElasticsearchCfg config.ElasticsearchSinkConfig) *ElasticsearchSinkHandler {
+func NewElasticsearchSinkHandler(baseSink sink.BaseSink, sinkElasticsearchCfg *config.ElasticsearchSinkConfig) *ElasticsearchSinkHandler {
 	handler := &ElasticsearchSinkHandler{
 		BaseSink:             baseSink,
-		sinkElasticsearchCfg: sinkElasticsearchCfg,
+		sinkElasticsearchCfg: *sinkElasticsearchCfg,
 	}
 	handler.InitSink()
 	handler.SetFromTransformChan()

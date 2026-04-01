@@ -135,7 +135,7 @@ func TestConvertModeSelector(t *testing.T) {
 	}
 
 	for _, unit := range testUnits {
-		handler.SetStreamConfig(streamConfig).InitTransform(unit.Config, 0)
+		handler.SetStreamConfig(streamConfig).InitTransform(&unit.Config, 0)
 		actual := handler.ConvertModeSelector(unit.InputData)
 		if !reflect.DeepEqual(actual, unit.OutputData) {
 			t.Fatalf("assertion failed, unexpected: %v, expected: %v", actual, unit.OutputData)
@@ -273,7 +273,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	handlerImpl := handler.(*Handler)
 
 	t.Run("row mode", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{Mode: "row"}, 1)
+		handlerImpl.InitTransform(&config.TransformConfig{Mode: "row"}, 1)
 		sourceOutput := &models.SourceOutput{
 			MetaData:   &models.MetaData{SourceTagName: "Unknown"},
 			SourceData: "test-data",
@@ -284,7 +284,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("row mode with filters", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{
+		handlerImpl.InitTransform(&config.TransformConfig{
 			Mode: "row",
 			Filters: []config.TransformFilter{
 				{Field: "key", Operator: "eq", Value: "value"},
@@ -299,7 +299,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("json mode", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{Mode: "json"}, 1)
+		handlerImpl.InitTransform(&config.TransformConfig{Mode: "json"}, 1)
 		sourceOutput := &models.SourceOutput{
 			MetaData:   &models.MetaData{SourceTagName: "Unknown"},
 			SourceData: []byte(`{"key":"value"}`),
@@ -310,7 +310,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("json mode with filter match", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{
+		handlerImpl.InitTransform(&config.TransformConfig{
 			Mode: "json",
 			Filters: []config.TransformFilter{
 				{Field: "key", Operator: "eq", Value: "value"},
@@ -325,7 +325,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("json mode with filter not match", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{
+		handlerImpl.InitTransform(&config.TransformConfig{
 			Mode: "json",
 			Filters: []config.TransformFilter{
 				{Field: "key", Operator: "eq", Value: "other"},
@@ -340,7 +340,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("jsonPath mode", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{
+		handlerImpl.InitTransform(&config.TransformConfig{
 			Mode: "jsonPath",
 			Paths: []config.TransformJsonPath{
 				{Path: "key", DestField: "key"},
@@ -355,7 +355,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("jsonPath mode paths nil", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{
+		handlerImpl.InitTransform(&config.TransformConfig{
 			Mode:  "jsonPath",
 			Paths: nil,
 		}, 1)
@@ -369,7 +369,7 @@ func TestSourceTransformModeSelector(t *testing.T) {
 	})
 
 	t.Run("default mode", func(t *testing.T) {
-		handlerImpl.InitTransform(config.TransformConfig{Mode: "unknown"}, 1)
+		handlerImpl.InitTransform(&config.TransformConfig{Mode: "unknown"}, 1)
 		sourceOutput := &models.SourceOutput{
 			MetaData:   &models.MetaData{SourceTagName: "Unknown"},
 			SourceData: []byte(`{"key":"value"}`),
@@ -397,7 +397,7 @@ func TestHandler_InitTransform(t *testing.T) {
 		},
 	}
 
-	result := handler.InitTransform(transformConfig, 10)
+	result := handler.InitTransform(&transformConfig, 10)
 	assert.NotNil(t, result)
 }
 
@@ -407,7 +407,7 @@ func TestHandler_CloseTransform(t *testing.T) {
 
 	handler := NewTransformHandler(nil, nil)
 	transformConfig := config.TransformConfig{Mode: "json"}
-	handler.InitTransform(transformConfig, 10)
+	handler.InitTransform(&transformConfig, 10)
 
 	assert.NotPanics(t, func() {
 		handler.CloseTransform()
@@ -445,7 +445,7 @@ func TestHandler_Pipeline(t *testing.T) {
 	}
 
 	handler := NewTransformHandler(inputChan, outputChan)
-	handler.SetStreamConfig(streamConfig).SetMetricsHooks(metrics).InitTransform(transformConfig, 10)
+	handler.SetStreamConfig(streamConfig).SetMetricsHooks(metrics).InitTransform(&transformConfig, 10)
 
 	// Start pipeline goroutines
 	go handler.(*Handler).From()

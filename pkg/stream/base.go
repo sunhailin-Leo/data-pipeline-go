@@ -152,7 +152,7 @@ func (b *BaseStream) Start() {
 func NewSink(sinkType string, baseSink sink.BaseSink, sinkConfig *config.SinkConfig) sink.Sink {
 	switch sinkType {
 	case utils.SinkClickhouseTagName:
-		return clickhouse.NewClickhouseSink(baseSink, sinkConfig.Clickhouse)
+		return clickhouse.NewClickhouseSink(baseSink, &sinkConfig.Clickhouse)
 	case utils.SinkConsoleTagName:
 		return console.NewConsoleSinkHandler(baseSink)
 	case utils.SinkHTTPTagName:
@@ -160,23 +160,23 @@ func NewSink(sinkType string, baseSink sink.BaseSink, sinkConfig *config.SinkCon
 	case utils.SinkKafkaTagName:
 		return kafkaSink.NewKafkaSinkHandler(baseSink, sinkConfig.Kafka)
 	case utils.SinkRedisTagName:
-		return redis.NewRedisSinkHandler(baseSink, sinkConfig.Redis)
+		return redis.NewRedisSinkHandler(baseSink, &sinkConfig.Redis)
 	case utils.SinkPostgresSQLTagName:
-		return postgressql.NewPostgresSQLHandler(baseSink, sinkConfig.PostgresSQL)
+		return postgressql.NewPostgresSQLHandler(baseSink, &sinkConfig.PostgresSQL)
 	case utils.SinkRocketMQTagName:
 		return rocketmqSink.NewRocketMQSinkHandler(baseSink, sinkConfig.RocketMQ)
 	case utils.SinkRabbitMQTagName:
-		return rabbitmqSink.NewRabbitMQSinkHandler(baseSink, sinkConfig.RabbitMQ)
+		return rabbitmqSink.NewRabbitMQSinkHandler(baseSink, &sinkConfig.RabbitMQ)
 	case utils.SinkOracleTagName:
-		return oracle.NewOracleSinkHandler(baseSink, sinkConfig.Oracle)
+		return oracle.NewOracleSinkHandler(baseSink, &sinkConfig.Oracle)
 	case utils.SinkMySQLTagName:
-		return mysql.NewMySQLSinkHandler(baseSink, sinkConfig.MySQL)
+		return mysql.NewMySQLSinkHandler(baseSink, &sinkConfig.MySQL)
 	}
 	return nil
 }
 
 // NewSource create source
-func NewSource(sourceType string, baseSource source.BaseSource) source.Source {
+func NewSource(sourceType string, baseSource *source.BaseSource) source.Source {
 	switch sourceType {
 	case utils.SourceKafkaTagName:
 		return kafkaSource.NewKafkaSource(baseSource)

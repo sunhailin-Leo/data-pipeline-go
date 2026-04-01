@@ -36,7 +36,7 @@ func TestNewOracleSinkHandler(t *testing.T) {
 		TableName: "<test table>",
 		BulkSize:  5,
 	}
-	oraClient := NewOracleSinkHandler(base, testOracleConfig)
+	oraClient := NewOracleSinkHandler(base, &testOracleConfig)
 	// Sink Write
 	go oraClient.WriteData()
 

@@ -53,7 +53,7 @@ func TestNewPulsarSourceHandler(t *testing.T) {
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
-	p := NewPulsarSourceHandler(baseSource)
+	p := NewPulsarSourceHandler(&baseSource)
 	c := p.GetToTransformChan()
 
 	// Producer - Send Data

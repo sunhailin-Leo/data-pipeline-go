@@ -163,10 +163,10 @@ func (o *OracleSinkHandler) CloseSink() {
 	o.Close()
 }
 
-func NewOracleSinkHandler(baseSink sink.BaseSink, sinkOracleCfg config.OracleSinkConfig) *OracleSinkHandler {
+func NewOracleSinkHandler(baseSink sink.BaseSink, sinkOracleCfg *config.OracleSinkConfig) *OracleSinkHandler {
 	handler := &OracleSinkHandler{
 		BaseSink:      baseSink,
-		sinkOracleCfg: sinkOracleCfg,
+		sinkOracleCfg: *sinkOracleCfg,
 		ticker:        time.NewTicker(time.Duration(defaultFlushTime) * time.Second),
 	}
 	handler.InitSink()

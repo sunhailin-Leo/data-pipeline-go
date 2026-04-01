@@ -127,7 +127,7 @@ func (r *RabbitMQSinkHandler) CloseSink() {
 }
 
 // NewRabbitMQSinkHandler creates a new RabbitMQ sink handler
-func NewRabbitMQSinkHandler(baseSink sink.BaseSink, sinkRabbitMQCfg config.RabbitMQSinkConfig) *RabbitMQSinkHandler {
+func NewRabbitMQSinkHandler(baseSink sink.BaseSink, sinkRabbitMQCfg *config.RabbitMQSinkConfig) *RabbitMQSinkHandler {
 	handler := &RabbitMQSinkHandler{
 		BaseSink:         baseSink,
 		sinkAddress:      sinkRabbitMQCfg.Address,

@@ -39,7 +39,7 @@ func TestNewRocketMQSource(t *testing.T) {
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
-	rmq := NewRocketMQSource(baseSource)
+	rmq := NewRocketMQSource(&baseSource)
 	c := rmq.GetToTransformChan()
 
 	go rmq.FetchData()

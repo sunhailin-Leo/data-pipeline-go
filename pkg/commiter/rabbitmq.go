@@ -8,7 +8,7 @@ import (
 )
 
 // rabbitmqMessageCommit RabbitMQ message commit
-func rabbitmqMessageCommit(client rabbitmq.Delivery, configName string) {
+func rabbitmqMessageCommit(client *rabbitmq.Delivery, configName string) {
 	ackErr := client.Ack(true)
 	if ackErr != nil {
 		logger.Logger.Error(utils.LogServiceName +

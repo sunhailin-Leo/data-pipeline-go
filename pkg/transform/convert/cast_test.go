@@ -329,7 +329,7 @@ func TestJsonPathQueriesToMap2(t *testing.T) {
       {
         "category": "fiction",
         "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
+        "title": "Sword of Honor",
         "price": 12.99
       },
       {

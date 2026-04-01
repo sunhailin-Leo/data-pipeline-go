@@ -16,7 +16,7 @@ func MessageCommit(client, message interface{}, configName string, params ...int
 	case rocketmq.PullConsumer:
 		rocketmqMessageCommit(c, message.(*primitive.MessageQueue), configName, params[0].(int64))
 	case rabbitmq.Delivery:
-		rabbitmqMessageCommit(c, configName)
+		rabbitmqMessageCommit(&c, configName)
 	case pulsar.Consumer:
 		pulsarMessageCommit(c, message.(pulsar.Message), configName)
 	}

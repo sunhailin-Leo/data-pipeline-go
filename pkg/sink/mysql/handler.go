@@ -183,10 +183,10 @@ func (m *MySQLSinkHandler) CloseSink() {
 	m.Close()
 }
 
-func NewMySQLSinkHandler(baseSink sink.BaseSink, sinkMySQLCfg config.MySQLSinkConfig) *MySQLSinkHandler {
+func NewMySQLSinkHandler(baseSink sink.BaseSink, sinkMySQLCfg *config.MySQLSinkConfig) *MySQLSinkHandler {
 	handler := &MySQLSinkHandler{
 		BaseSink:     baseSink,
-		sinkMySQLCfg: sinkMySQLCfg,
+		sinkMySQLCfg: *sinkMySQLCfg,
 		ticker:       time.NewTicker(time.Duration(defaultFlushTime) * time.Second),
 	}
 	handler.InitSink()

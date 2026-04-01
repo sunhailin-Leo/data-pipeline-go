@@ -44,7 +44,7 @@ func (s *Handler) GetSource(streamConfig *config.StreamConfig) map[string]chan *
 			Metrics:         s.metrics,
 		}
 
-		src := NewSource(sourceConfig.Type, baseSource)
+		src := NewSource(sourceConfig.Type, &baseSource)
 		if src == nil {
 			logger.Logger.Error(utils.LogServiceName + "[Source-Init]Source configuration error! Type: " + sourceConfig.Type)
 			return sourceInputChanMap
@@ -61,7 +61,7 @@ func (s *Handler) GetSource(streamConfig *config.StreamConfig) map[string]chan *
 // GetTransform init transform
 func (s *Handler) GetTransform(inputChan chan *models.SourceOutput, outputChanMap map[string]chan *models.TransformOutput, streamConfig *config.StreamConfig) transform.Transform {
 	t := transform.NewTransformHandler(inputChan, outputChanMap)
-	t.SetMetricsHooks(s.metrics).SetStreamConfig(streamConfig).InitTransform(streamConfig.Transform, streamConfig.ChannelSize)
+	t.SetMetricsHooks(s.metrics).SetStreamConfig(streamConfig).InitTransform(&streamConfig.Transform, streamConfig.ChannelSize)
 	return t
 }
 
@@ -99,23 +99,24 @@ func (s *Handler) InitStream() {
 
 	// generate stream
 	for _, streamConfig := range s.streamsConfig {
-		if streamConfig.Enable {
-			sourceChanMap := s.GetSource(streamConfig)
-			// multi-source fan-in: merge all source channels into one
-			var sourceChan chan *models.SourceOutput
-			if len(sourceChanMap) == 1 {
-				for _, ch := range sourceChanMap {
-					sourceChan = ch
-				}
-			} else {
-				sourceChan = s.mergeSourceChannels(sourceChanMap, streamConfig.ChannelSize)
-				logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Multi-source fan-in enabled for stream: " + streamConfig.Name)
-			}
-			sinkChanMap := s.GetSink(streamConfig)
-			transformObj := s.GetTransform(sourceChan, sinkChanMap, streamConfig)
-			s.streamMap[streamConfig.Name] = transformObj
-			logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Stream: " + streamConfig.Name + " initialize successful!")
+		if !streamConfig.Enable {
+			continue
 		}
+		sourceChanMap := s.GetSource(streamConfig)
+		// multi-source fan-in: merge all source channels into one
+		var sourceChan chan *models.SourceOutput
+		if len(sourceChanMap) == 1 {
+			for _, ch := range sourceChanMap {
+				sourceChan = ch
+			}
+		} else {
+			sourceChan = s.mergeSourceChannels(sourceChanMap, streamConfig.ChannelSize)
+			logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Multi-source fan-in enabled for stream: " + streamConfig.Name)
+		}
+		sinkChanMap := s.GetSink(streamConfig)
+		transformObj := s.GetTransform(sourceChan, sinkChanMap, streamConfig)
+		s.streamMap[streamConfig.Name] = transformObj
+		logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Stream: " + streamConfig.Name + " initialize successful!")
 	}
 
 	logger.Logger.Info(utils.LogServiceName + "[Stream-Init]Stream initialize successful!")

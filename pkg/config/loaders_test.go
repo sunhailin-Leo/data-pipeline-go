@@ -109,7 +109,7 @@ func TestLoadConfigFromLocal(t *testing.T) {
 	}`
 
 	// Write temporary config file
-	err := os.WriteFile(testConfigFile, []byte(testConfigContent), 0644)
+	err := os.WriteFile(testConfigFile, []byte(testConfigContent), 0o644)
 	assert.NoError(t, err)
 	defer os.Remove(testConfigFile)
 
@@ -391,7 +391,7 @@ func TestLoad_LocalPath(t *testing.T) {
 	// Create temp config file
 	testConfigFile := "test_load_config.json"
 	testConfigContent := `{"streams":[{"name":"s1","enable":true,"source":[{"type":"Kafka","source_name":"k1"}],"transform":{"mode":"json","schemas":[]},"sink":[{"type":"ClickHouse","sink_name":"c1"}]}]}`
-	err := os.WriteFile(testConfigFile, []byte(testConfigContent), 0644)
+	err := os.WriteFile(testConfigFile, []byte(testConfigContent), 0o644)
 	assert.NoError(t, err)
 	defer os.Remove(testConfigFile)
 

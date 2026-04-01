@@ -51,7 +51,7 @@ func TestNewClickhouseSink(t *testing.T) {
 		BulkSize: 5,
 	}
 
-	ckClient := NewClickhouseSink(base, testClickhouseConfig)
+	ckClient := NewClickhouseSink(base, &testClickhouseConfig)
 	go ckClient.WriteData()
 
 	c := ckClient.GetFromTransformChan()

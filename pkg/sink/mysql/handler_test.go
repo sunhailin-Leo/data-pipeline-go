@@ -43,7 +43,7 @@ func TestNewMySQLSinkHandler(t *testing.T) {
 		BulkSize:  5,
 	}
 
-	mysqlClient := NewMySQLSinkHandler(base, testMySQLConfig)
+	mysqlClient := NewMySQLSinkHandler(base, &testMySQLConfig)
 	go mysqlClient.WriteData()
 
 	c := mysqlClient.GetFromTransformChan()

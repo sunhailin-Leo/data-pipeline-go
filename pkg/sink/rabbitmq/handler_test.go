@@ -48,7 +48,7 @@ func TestNewRabbitMQSinkHandler(t *testing.T) {
 		},
 	}
 
-	rmqClient := NewRabbitMQSinkHandler(base, testSinkConfig.RabbitMQ)
+	rmqClient := NewRabbitMQSinkHandler(base, &testSinkConfig.RabbitMQ)
 	go rmqClient.WriteData()
 
 	r := rmqClient.GetFromTransformChan()

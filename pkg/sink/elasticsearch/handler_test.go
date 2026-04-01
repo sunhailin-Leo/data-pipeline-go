@@ -48,7 +48,7 @@ func TestNewElasticsearchSinkHandler(t *testing.T) {
 		},
 	}
 
-	elasticsearchClient := NewElasticsearchSinkHandler(base, testSinkConfig.Elasticsearch)
+	elasticsearchClient := NewElasticsearchSinkHandler(base, &testSinkConfig.Elasticsearch)
 	go elasticsearchClient.WriteData()
 
 	e := elasticsearchClient.GetFromTransformChan()

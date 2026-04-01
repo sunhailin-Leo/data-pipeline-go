@@ -41,7 +41,7 @@ func TestNewRedisSinkHandler(t *testing.T) {
 		},
 	}
 
-	redisClient := NewRedisSinkHandler(base, testSinkConfig.Redis)
+	redisClient := NewRedisSinkHandler(base, &testSinkConfig.Redis)
 	go redisClient.WriteData()
 
 	r := redisClient.GetFromTransformChan()

@@ -70,7 +70,7 @@ func matchSingleFilter(fieldValue any, operator string, filterValue any) bool {
 	}
 }
 
-func matchIn(fieldValue any, filterValue any) bool {
+func matchIn(fieldValue, filterValue any) bool {
 	fieldStr := fmt.Sprintf("%v", fieldValue)
 	switch values := filterValue.(type) {
 	case []any:

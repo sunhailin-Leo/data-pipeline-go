@@ -122,7 +122,7 @@ func (c *ClickhouseSinkHandler) WriteData() {
 
 // autoCreateTable auto create Clickhouse table
 func (c *ClickhouseSinkHandler) autoCreateTable() {
-	templateSQL, err := RenderClickhouseCreateTableTemplate("autoCreateTable", c.sinkClickhouseCfg)
+	templateSQL, err := RenderClickhouseCreateTableTemplate("autoCreateTable", &c.sinkClickhouseCfg)
 	if err != nil {
 		return
 	}
@@ -181,10 +181,10 @@ func (c *ClickhouseSinkHandler) CloseSink() {
 }
 
 // NewClickhouseSink create Clickhouse Sink
-func NewClickhouseSink(baseSink sink.BaseSink, clickhouseCfg config.ClickhouseSinkConfig) *ClickhouseSinkHandler {
+func NewClickhouseSink(baseSink sink.BaseSink, clickhouseCfg *config.ClickhouseSinkConfig) *ClickhouseSinkHandler {
 	handler := &ClickhouseSinkHandler{
 		BaseSink:          baseSink,
-		sinkClickhouseCfg: clickhouseCfg,
+		sinkClickhouseCfg: *clickhouseCfg,
 		ticker:            time.NewTicker(time.Duration(defaultFlushTime) * time.Second),
 	}
 	handler.InitSink()

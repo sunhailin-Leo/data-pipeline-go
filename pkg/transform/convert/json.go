@@ -1,11 +1,12 @@
 package convert
 
 import (
+	"strings"
+
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/config"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
-	"strings"
 )
 
 // convertToJsonBytes converts result data to JSON bytes using specialProcessKeys.

@@ -20,7 +20,7 @@ func TestMetricsHandler(t *testing.T) {
 	assert.NotNil(t, handler)
 
 	// Test that handler is actually an http.Handler
-	req := httptest.NewRequest("GET", "/metrics", nil)
+	req := httptest.NewRequest("GET", "/metrics", http.NoBody)
 	w := httptest.NewRecorder()
 	handler.ServeHTTP(w, req)
 

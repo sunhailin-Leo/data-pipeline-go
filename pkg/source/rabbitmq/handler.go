@@ -109,9 +109,9 @@ func (r *RabbitMQSourceHandler) CloseSource() {
 }
 
 // NewRabbitMQSource initializes a new RabbitMQ source handler
-func NewRabbitMQSource(baseSource source.BaseSource) *RabbitMQSourceHandler {
+func NewRabbitMQSource(baseSource *source.BaseSource) *RabbitMQSourceHandler {
 	handler := &RabbitMQSourceHandler{
-		BaseSource:         baseSource,
+		BaseSource:         *baseSource,
 		sourceAddress:      baseSource.SourceConfig.RabbitMQ.Address,
 		sourceUsername:     baseSource.SourceConfig.RabbitMQ.Username,
 		sourcePassword:     baseSource.SourceConfig.RabbitMQ.Password,
