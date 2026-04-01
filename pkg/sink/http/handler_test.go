@@ -53,14 +53,14 @@ func mockHttpServerHandler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(`{"status":"ok"}`))
 }
 
-// mockHttpServer Simulating an HTTP server
+// mockHttpServer Simulating an HTTP server with a random available port
 func mockHttpServer() (*http.Server, net.Listener) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/test", mockHttpServerHandler)
-	// Specify the IP and port to listen on
-	listener, err := net.Listen("tcp", "127.0.0.1:8080")
+	// Use port 0 to let the OS assign a random available port
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		panic(fmt.Sprintf("Failed to listen on 127.0.0.1:8080: %v", err))
+		panic(fmt.Sprintf("Failed to listen on 127.0.0.1: %v", err))
 	}
 	// start HTTP server
 	server := &http.Server{Handler: mux}
@@ -92,11 +92,13 @@ func TestNewHTTPSinkHandler(t *testing.T) {
 		SinkAliasName: "http-1",
 		ChanSize:      100,
 	}
+	// Use the actual address from the listener (random port)
+	listenAddr := listener.Addr().String()
 	testSinkConfig := &config.SinkConfig{
 		Type:     utils.SinkHTTPTagName,
 		SinkName: "HTTP-1",
 		HTTP: config.HTTPSinkConfig{
-			URL:         "http://localhost:8080/test",
+			URL:         "http://" + listenAddr + "/test",
 			ContentType: utils.HTTPContentTypeJSON,
 		},
 	}

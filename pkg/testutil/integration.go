@@ -30,6 +30,10 @@ const (
 	EnvESAddr         = "INTEGRATION_ES_ADDR"
 	EnvESUser         = "INTEGRATION_ES_USER"
 	EnvESPass         = "INTEGRATION_ES_PASS"
+	EnvOracleAddr     = "INTEGRATION_ORACLE_ADDR"
+	EnvOracleUser     = "INTEGRATION_ORACLE_USER"
+	EnvOraclePass     = "INTEGRATION_ORACLE_PASS"
+	EnvOracleDB       = "INTEGRATION_ORACLE_DB"
 )
 
 // SkipIfNotIntegration skips the test if INTEGRATION_TEST env var is not set.

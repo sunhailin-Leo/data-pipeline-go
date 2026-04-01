@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 )
 
 func initLogger() {
@@ -18,10 +19,15 @@ func initLogger() {
 }
 
 func TestNewOracleSinkHandler(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink Oracle Test
+
+	oracleAddr := testutil.GetEnvOrDefault(testutil.EnvOracleAddr, "localhost:1521")
+	oracleUser := testutil.GetEnvOrDefault(testutil.EnvOracleUser, "system")
+	oraclePass := testutil.GetEnvOrDefault(testutil.EnvOraclePass, "testpass")
+	oracleDB := testutil.GetEnvOrDefault(testutil.EnvOracleDB, "orcl")
+
 	base := sink.BaseSink{
 		ChanSize:      100,
 		StreamName:    "",
@@ -29,11 +35,11 @@ func TestNewOracleSinkHandler(t *testing.T) {
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 	}
 	testOracleConfig := config.OracleSinkConfig{
-		Address:   "<test address>",
-		Username:  "<test username>",
-		Password:  "<test password>",
-		Database:  "orcl",
-		TableName: "<test table>",
+		Address:   oracleAddr,
+		Username:  oracleUser,
+		Password:  oraclePass,
+		Database:  oracleDB,
+		TableName: "test_table",
 		BulkSize:  5,
 	}
 	oraClient := NewOracleSinkHandler(base, &testOracleConfig)

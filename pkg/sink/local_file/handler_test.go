@@ -54,7 +54,7 @@ func TestNewLocalFileHandler(t *testing.T) {
 		}
 	}
 	// for waiting data insert
-	time.Sleep(10 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	localFileClient.CloseSink()
 }
