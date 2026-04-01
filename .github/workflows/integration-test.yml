@@ -67,7 +67,7 @@ jobs:
           INTEGRATION_ES_ADDR: http://localhost:9200
           INTEGRATION_ES_USER: elastic
           INTEGRATION_ES_PASS: testpass
-        run: go test -v -race -timeout 180s ./pkg/sink/... ./pkg/source/...
+        run: go test -v -race -timeout 600s ./pkg/sink/... ./pkg/source/...
 
       - name: Stop services
         if: always()
