@@ -61,10 +61,22 @@ jobs:
       - name: Verify dependencies
         run: go mod verify
 
+      - name: Determine CGO setting
+        id: cgo
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "linux" ] && [ "${{ matrix.arch }}" = "amd64" ]; then
+            echo "enabled=1" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.os }}" = "darwin" ]; then
+            echo "enabled=1" >> $GITHUB_OUTPUT
+          else
+            echo "enabled=0" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build (Unix)
         if: matrix.os != 'windows'
         env:
-          CGO_ENABLED: 1
+          CGO_ENABLED: ${{ steps.cgo.outputs.enabled }}
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
         run: |
@@ -74,7 +86,7 @@ jobs:
       - name: Build (Windows)
         if: matrix.os == 'windows'
         env:
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           GOOS: windows
           GOARCH: amd64
         run: |

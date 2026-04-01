@@ -10,6 +10,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/source"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -17,26 +18,25 @@ func initLogger() {
 	logger.NewZapLogger()
 }
 
-func testPulsarSourceMock(topic string) (pulsar.Client, pulsar.Producer) {
-	client, clientErr := pulsar.NewClient(pulsar.ClientOptions{URL: "pulsar://172.20.49.19:16650"})
-	if clientErr != nil {
-		panic(clientErr)
-	}
-
-	producer, producerErr := client.CreateProducer(pulsar.ProducerOptions{Topic: topic})
-	if producerErr != nil {
-		panic(producerErr)
-	}
-
-	return client, producer
-}
-
 func TestNewPulsarSourceHandler(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Client, Producer
-	client, producer := testPulsarSourceMock("alg_test")
+
+	pulsarAddr := testutil.GetEnvOrDefault(testutil.EnvPulsarAddr, "localhost:6650")
+	testTopic := "integration-test-source-topic"
+
+	// Producer
+	client, clientErr := pulsar.NewClient(pulsar.ClientOptions{URL: "pulsar://" + pulsarAddr})
+	if clientErr != nil {
+		t.Fatalf("Failed to create Pulsar client: %v", clientErr)
+	}
+
+	producer, producerErr := client.CreateProducer(pulsar.ProducerOptions{Topic: testTopic})
+	if producerErr != nil {
+		t.Fatalf("Failed to create Pulsar producer: %v", producerErr)
+	}
+
 	// Source - Consumer
 	baseSource := source.BaseSource{
 		ChanSize:        100,
@@ -46,15 +46,14 @@ func TestNewPulsarSourceHandler(t *testing.T) {
 			Type:       utils.SourcePulsarTagName,
 			SourceName: "pulsar-1",
 			Pulsar: config.PulsarSourceConfig{
-				Address:          "172.20.49.19:16650",
-				Topic:            "alg_test",
+				Address:          pulsarAddr,
+				Topic:            testTopic,
 				SubscriptionName: utils.ServiceName,
 			},
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
 	p := NewPulsarSourceHandler(baseSource)
-	// p.SetDebugMode(true)
 	c := p.GetToTransformChan()
 
 	// Producer - Send Data
@@ -72,7 +71,7 @@ func TestNewPulsarSourceHandler(t *testing.T) {
 	}
 
 	fetchMessage := fetchData.SourceData.(pulsar.Message)
-	println(string(fetchMessage.Payload()))
+	t.Logf("Received message: %s", string(fetchMessage.Payload()))
 
 	p.CloseSource()
 }

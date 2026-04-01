@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 )
 
 func initLogger() {
@@ -18,10 +19,15 @@ func initLogger() {
 }
 
 func TestNewMySQLSinkHandler(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink MySQL Test
+
+	mysqlAddr := testutil.GetEnvOrDefault(testutil.EnvMySQLAddr, "localhost:3306")
+	mysqlUser := testutil.GetEnvOrDefault(testutil.EnvMySQLUser, "root")
+	mysqlPass := testutil.GetEnvOrDefault(testutil.EnvMySQLPass, "testpass")
+	mysqlDB := testutil.GetEnvOrDefault(testutil.EnvMySQLDB, "integration_test")
+
 	base := sink.BaseSink{
 		ChanSize:      100,
 		StreamName:    "",
@@ -29,18 +35,17 @@ func TestNewMySQLSinkHandler(t *testing.T) {
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 	}
 	testMySQLConfig := config.MySQLSinkConfig{
-		Address:   "<test address>",
-		Username:  "<test username>",
-		Password:  "<test password>",
-		Database:  "ai_group",
-		TableName: "<test table>",
+		Address:   mysqlAddr,
+		Username:  mysqlUser,
+		Password:  mysqlPass,
+		Database:  mysqlDB,
+		TableName: "integration_test_table",
 		BulkSize:  5,
 	}
+
 	mysqlClient := NewMySQLSinkHandler(base, testMySQLConfig)
-	// Sink Write
 	go mysqlClient.WriteData()
 
-	// channel
 	c := mysqlClient.GetFromTransformChan()
 	for i := 1; i < 20; i++ {
 		c <- &models.TransformOutput{
@@ -55,7 +60,6 @@ func TestNewMySQLSinkHandler(t *testing.T) {
 		}
 	}
 
-	// for waiting data insert
-	time.Sleep(20 * time.Second)
+	time.Sleep(5 * time.Second)
 	mysqlClient.CloseSink()
 }

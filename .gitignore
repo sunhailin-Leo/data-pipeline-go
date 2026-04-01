@@ -30,3 +30,9 @@ benchmark_results.txt
 # Coverage files
 coverage.out
 coverage.html
+
+# Test log files
+logs/
+
+# Test temporary files
+pkg/sink/local_file/test.txt

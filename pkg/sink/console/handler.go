@@ -29,15 +29,21 @@ func (c *ConsoleSinkHandler) WriteData() {
 			return
 		}
 
-		c.Metrics.OnSinkInput(c.StreamName, c.SinkAliasName)
-		c.Metrics.OnSinkInputSuccess(c.StreamName, c.SinkAliasName)
+		if c.Metrics != nil {
+			c.Metrics.OnSinkInput(c.StreamName, c.SinkAliasName)
+			c.Metrics.OnSinkInputSuccess(c.StreamName, c.SinkAliasName)
+		}
 
 		logger.Logger.Info(utils.LogServiceName +
 			"[Console-Sink][Current config: " + c.SinkAliasName + "]data: " + fmt.Sprintf("%v", data))
 
-		c.Metrics.OnSinkOutput(c.StreamName, c.SinkAliasName)
-		c.Metrics.OnSinkOutputSuccess(c.StreamName, c.SinkAliasName)
-		c.MessageCommit(data.SourceObj, data.SourceData, c.SinkAliasName)
+		if c.Metrics != nil {
+			c.Metrics.OnSinkOutput(c.StreamName, c.SinkAliasName)
+			c.Metrics.OnSinkOutputSuccess(c.StreamName, c.SinkAliasName)
+		}
+		if data.SourceOutput != nil && data.MetaData != nil {
+			c.MessageCommit(data.SourceObj, data.SourceData, c.SinkAliasName)
+		}
 	}
 }
 

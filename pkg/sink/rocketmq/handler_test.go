@@ -1,6 +1,7 @@
 package sink
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,10 +21,12 @@ func initLogger() {
 }
 
 func TestNewRocketMQSinkHandler(t *testing.T) {
-	t.Helper()
-	// init logger
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink config
+
+	rocketmqAddr := testutil.GetEnvOrDefault(testutil.EnvRocketMQAddr, "127.0.0.1:9876")
+
 	base := sink.BaseSink{
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 		StreamName:    "",
@@ -33,16 +37,20 @@ func TestNewRocketMQSinkHandler(t *testing.T) {
 		Type:     utils.SinkRocketMQTagName,
 		SinkName: "rocketmq-1",
 		RocketMQ: config.RocketMQSinkConfig{
-			Address:     "<test address>",
-			Topic:       "<test topic>",
+			Address:     rocketmqAddr,
+			Topic:       "integration-test-topic",
 			MessageMode: "json",
 		},
 	}
-	// init RocketMQSinkHandler
+
 	rmqClient := NewRocketMQSinkHandler(base, testSinkConfig.RocketMQ)
-	// Sink Write
-	go rmqClient.WriteData()
-	// Channel
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		rmqClient.WriteData()
+	}()
+
 	r := rmqClient.GetFromTransformChan()
 	for i := 0; i < 5; i++ {
 		r <- &models.TransformOutput{
@@ -53,8 +61,9 @@ func TestNewRocketMQSinkHandler(t *testing.T) {
 			SinkName: "rocketmq-1",
 		}
 	}
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
 
-	rmqClient.CloseSink()
+	// Wait for all data to be processed, then close channel and wait for goroutine exit
+	time.Sleep(2 * time.Second)
+	rmqClient.Close()
+	wg.Wait()
 }

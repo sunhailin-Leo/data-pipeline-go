@@ -101,18 +101,28 @@ func (e *ElasticsearchSinkHandler) WriteData() {
 			return
 		}
 		data, ok := <-e.GetFromTransformChan()
-		e.Metrics.OnSinkInput(e.StreamName, e.SinkAliasName)
+		if e.Metrics != nil {
+			e.Metrics.OnSinkInput(e.StreamName, e.SinkAliasName)
+		}
 		if !ok {
 			logger.Logger.Error(utils.LogServiceName + "[Elasticsearch-Sink][Current config: " + e.SinkAliasName + "]data source is already closed!")
 			return
 		}
-		e.Metrics.OnSinkInputSuccess(e.StreamName, e.SinkAliasName)
-		e.Metrics.OnSinkOutput(e.StreamName, e.SinkAliasName)
+		if e.Metrics != nil {
+			e.Metrics.OnSinkInputSuccess(e.StreamName, e.SinkAliasName)
+		}
+		if e.Metrics != nil {
+			e.Metrics.OnSinkOutput(e.StreamName, e.SinkAliasName)
+		}
 		if writeErr := e.write(data); writeErr != nil {
 			logger.Logger.Error(utils.LogServiceName + "[Kafka-Sink][Current config: " + e.SinkAliasName + "]send data error! Reason: " + writeErr.Error())
 		} else {
-			e.Metrics.OnSinkOutputSuccess(e.StreamName, e.SinkAliasName)
-			e.MessageCommit(data.SourceObj, data.SourceData, e.SinkAliasName)
+			if e.Metrics != nil {
+				e.Metrics.OnSinkOutputSuccess(e.StreamName, e.SinkAliasName)
+			}
+			if data.SourceOutput != nil && data.MetaData != nil {
+				e.MessageCommit(data.SourceObj, data.SourceData, e.SinkAliasName)
+			}
 		}
 	}
 }

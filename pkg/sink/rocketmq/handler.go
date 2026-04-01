@@ -51,20 +51,30 @@ func (r *RocketMQSinkHandler) WriteData() {
 		}
 
 		data, ok := <-r.GetFromTransformChan()
-		r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		}
 		if !ok {
 			logger.Logger.Error(utils.LogServiceName + "[RocketMQ-Sink][Current config: " + r.SinkAliasName + "]Sink is already closed!")
 			return
 		}
-		r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
-		r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
+		}
+		if r.Metrics != nil {
+			r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		}
 		msg := &primitive.Message{Topic: r.sinkTopic, Body: data.Data[0].([]byte)}
 		if sendRes, sendErr := r.rmqClient.SendSync(context.Background(), msg); sendErr != nil {
 			logger.Logger.Error(utils.LogServiceName + "[RocketMQ-Sink][Current config: " + r.SinkAliasName + "]Failed to send data! Reason for exception: " + sendErr.Error())
 		} else {
 			logger.Logger.Debug(utils.LogServiceName + "[RocketMQ-Sink][Current config: " + r.SinkAliasName + "]Send data successful! Message content: " + sendRes.String())
-			r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
-			r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			if r.Metrics != nil {
+				r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
+			}
+			if data.SourceOutput != nil && data.MetaData != nil {
+				r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			}
 		}
 	}
 }
@@ -75,7 +85,7 @@ func (r *RocketMQSinkHandler) InitSink() {
 		producer.WithNsResolver(primitive.NewPassthroughResolver(strings.Split(r.sinkAddress, ","))),
 		producer.WithRetry(2))
 	if rmqClientErr != nil {
-		logger.Logger.Fatal(utils.LogServiceName +
+		logger.Logger.Error(utils.LogServiceName +
 			"[RocketMQ-Sink][Current config: " + r.SinkAliasName + "]Failed to create RocketMQ Client! Reason for exception: " + rmqClientErr.Error())
 		return
 	}

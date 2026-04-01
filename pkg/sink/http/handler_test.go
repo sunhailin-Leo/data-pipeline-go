@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
@@ -101,8 +102,13 @@ func TestNewHTTPSinkHandler(t *testing.T) {
 	}
 
 	httpClient := NewHTTPSinkHandler(base, testSinkConfig.HTTP)
-	// Sink Write
-	go httpClient.WriteData()
+	// Sink Write with WaitGroup to synchronize goroutine exit
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		httpClient.WriteData()
+	}()
 	// channel
 	c := httpClient.GetFromTransformChan()
 	for i := 1; i < 10; i++ {
@@ -115,8 +121,8 @@ func TestNewHTTPSinkHandler(t *testing.T) {
 		}
 	}
 
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
-
-	httpClient.CloseSink()
+	// Wait for all data to be processed, then close channel and wait for goroutine exit
+	time.Sleep(2 * time.Second)
+	httpClient.Close()
+	wg.Wait()
 }

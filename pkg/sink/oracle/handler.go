@@ -122,6 +122,11 @@ func (o *OracleSinkHandler) WriteData() {
 // InitSink init Oracle connection
 func (o *OracleSinkHandler) InitSink() {
 	addressElements := strings.Split(o.sinkOracleCfg.Address, ":")
+	if len(addressElements) < 2 {
+		logger.Logger.Error(utils.LogServiceName +
+			"[Oracle-Sink][Current config: " + o.SinkAliasName + "]Invalid address format, expected host:port, got: " + o.sinkOracleCfg.Address)
+		return
+	}
 	connStr := goora.BuildUrl(
 		addressElements[0],
 		cast.ToInt(addressElements[1]),

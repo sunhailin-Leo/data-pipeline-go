@@ -42,13 +42,20 @@ func (r *RedisSinkHandler) WriteData() {
 		}
 
 		data, ok := <-r.GetFromTransformChan()
-		r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		}
 		if !ok {
 			logger.Logger.Error(utils.LogServiceName +
 				"[Redis-Sink][Current config: " + r.SinkAliasName + "]Sink is already closed!")
 			return
 		}
-		r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
+		}
+		if r.Metrics != nil {
+			r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		}
 
 		var isSuccess bool
 		key := r.sinkRedisCfg.KeyOrChannelName
@@ -78,10 +85,16 @@ func (r *RedisSinkHandler) WriteData() {
 		default:
 			logger.Logger.Error(utils.LogServiceName + "[Redis-Sink][Current config: " + r.SinkAliasName + "]Redis operation type error!")
 		}
-		r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		}
 		if isSuccess {
-			r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
-			r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			if r.Metrics != nil {
+				r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
+			}
+			if data.SourceOutput != nil && data.MetaData != nil {
+				r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			}
 		}
 	}
 }

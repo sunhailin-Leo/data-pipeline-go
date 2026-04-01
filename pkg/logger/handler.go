@@ -3,6 +3,7 @@ package logger
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -82,7 +83,7 @@ func NewZapLogger() {
 			zapcore.NewConsoleEncoder(getEncodeConfig(false)), // encoder config
 			zapcore.NewMultiWriteSyncer(
 				zapcore.AddSync(os.Stdout),
-				zapcore.AddSync(getRollingConfig("logs/"+utils.ServiceName+"/"+utils.GetHostName()+".log")),
+				zapcore.AddSync(getRollingConfig(filepath.Join("logs", utils.ServiceName, utils.GetHostName()+".log"))),
 			), // writer to console and file
 			zap.NewAtomicLevelAt(zap.DebugLevel), // set logger level
 		),

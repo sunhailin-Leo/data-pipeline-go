@@ -119,7 +119,7 @@ func (r *RocketMQSourceHandler) InitSource() {
 		}),
 		consumer.WithMaxReconsumeTimes(2))
 	if rmqClientErr != nil {
-		logger.Logger.Fatal(utils.LogServiceName +
+		logger.Logger.Error(utils.LogServiceName +
 			"[RocketMQ-Source][Current config: " + r.SourceAliasName + "]Failed to create RocketMQ client! Reason for exception: " + rmqClientErr.Error())
 		return
 	}

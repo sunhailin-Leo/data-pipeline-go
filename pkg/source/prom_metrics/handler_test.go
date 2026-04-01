@@ -7,6 +7,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/source"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -15,10 +16,10 @@ func initLogger() {
 }
 
 func TestNewPromMetricSourceHandler(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Source - Metrics Puller
+
 	baseSource := source.BaseSource{
 		DebugMode:       false,
 		ChanSize:        100,
@@ -28,17 +29,15 @@ func TestNewPromMetricSourceHandler(t *testing.T) {
 			SourceName: "prom-metrics-1",
 			PromMetrics: config.PromMetricsSourceConfig{
 				Address:  "http://localhost:8080/metrics",
-				Interval: 60,
+				Interval: 5,
 			},
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
 
 	pm := NewPromMetricSourceHandler(baseSource)
-	// pm.SetDebugMode(true)
 	c := pm.GetToTransformChan()
 
-	// Consumer - Fetch Data
 	go pm.FetchData()
 	fetchData, ok := <-c
 	if !ok || fetchData == nil {

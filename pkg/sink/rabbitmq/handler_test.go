@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,10 +20,14 @@ func initLogger() {
 }
 
 func TestNewRabbitMQSinkHandler(t *testing.T) {
-	t.Helper()
-	// init logger
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink config
+
+	rmqAddr := testutil.GetEnvOrDefault(testutil.EnvRabbitMQAddr, "localhost:5672")
+	rmqUser := testutil.GetEnvOrDefault(testutil.EnvRabbitMQUser, "testuser")
+	rmqPass := testutil.GetEnvOrDefault(testutil.EnvRabbitMQPass, "testpass")
+
 	base := sink.BaseSink{
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 		StreamName:    "",
@@ -33,20 +38,19 @@ func TestNewRabbitMQSinkHandler(t *testing.T) {
 		Type:     utils.SinkRabbitMQTagName,
 		SinkName: "rabbitmq-1",
 		RabbitMQ: config.RabbitMQSinkConfig{
-			Address:    "<test address>",
-			Username:   "<test username>",
-			Password:   "<test password>",
+			Address:    rmqAddr,
+			Username:   rmqUser,
+			Password:   rmqPass,
 			VHost:      "/",
-			Queue:      "<test queue>",
-			Exchange:   "<test exchange>",
+			Queue:      "integration-test-queue",
+			Exchange:   "integration-test-exchange",
 			RoutingKey: "#",
 		},
 	}
-	// init RabbitMQSinkHandler
+
 	rmqClient := NewRabbitMQSinkHandler(base, testSinkConfig.RabbitMQ)
-	// Sink Write
 	go rmqClient.WriteData()
-	// Channel
+
 	r := rmqClient.GetFromTransformChan()
 	for i := 0; i < 5; i++ {
 		r <- &models.TransformOutput{
@@ -57,9 +61,7 @@ func TestNewRabbitMQSinkHandler(t *testing.T) {
 			SinkName: "rabbitmq-1",
 		}
 	}
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
 
+	time.Sleep(3 * time.Second)
 	rmqClient.CloseSink()
-
 }

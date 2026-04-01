@@ -25,6 +25,7 @@ type PostgresSQLHandler struct {
 	sinkPostgresSQLCfg config.PostgresSQLSinkConfig
 	pgConn             *pgx.Conn
 	ticker             *time.Ticker
+	done               chan struct{}
 }
 
 // SinkName return PostgresSQL sink name
@@ -34,6 +35,12 @@ func (p *PostgresSQLHandler) SinkName() string {
 
 // WriteData write data into PostgresSQL
 func (p *PostgresSQLHandler) WriteData() {
+	defer func() {
+		if p.done != nil {
+			close(p.done)
+		}
+	}()
+
 	logger.Logger.Info(utils.LogServiceName +
 		"[PostgresSQL-Sink][Current config: " + p.SinkAliasName + "]Start waiting for data to be written...")
 
@@ -45,8 +52,10 @@ func (p *PostgresSQLHandler) WriteData() {
 	// flush data function
 	flushToDatabase := func(b *pgx.Batch) {
 		nRows := b.Len()
-		for i := 0; i < nRows; i++ {
-			p.Metrics.OnSinkOutput(p.StreamName, p.SinkAliasName)
+		if p.Metrics != nil {
+			for i := 0; i < nRows; i++ {
+				p.Metrics.OnSinkOutput(p.StreamName, p.SinkAliasName)
+			}
 		}
 
 		// start transaction
@@ -74,8 +83,10 @@ func (p *PostgresSQLHandler) WriteData() {
 
 		// commit transaction
 		if commitErr := tx.Commit(context.Background()); commitErr == nil {
-			for i := 0; i < nRows; i++ {
-				p.Metrics.OnSinkOutputSuccess(p.StreamName, p.SinkAliasName)
+			if p.Metrics != nil {
+				for i := 0; i < nRows; i++ {
+					p.Metrics.OnSinkOutputSuccess(p.StreamName, p.SinkAliasName)
+				}
 			}
 			logger.Logger.Debug(utils.LogServiceName +
 				"[PostgresSQL-Sink][Current config: " + p.SinkAliasName + "]Write " + strconv.Itoa(batchCounter) + " row data")
@@ -107,9 +118,14 @@ func (p *PostgresSQLHandler) WriteData() {
 			}
 		case row, ok := <-p.GetFromTransformChan():
 			if !ok || row == nil {
-				break
+				if batch != nil {
+					flushToDatabase(batch)
+				}
+				return
 			}
-			p.Metrics.OnSinkInput(p.StreamName, p.SinkAliasName)
+			if p.Metrics != nil {
+				p.Metrics.OnSinkInput(p.StreamName, p.SinkAliasName)
+			}
 
 			if batch == nil {
 				batch = &pgx.Batch{}
@@ -123,7 +139,9 @@ func (p *PostgresSQLHandler) WriteData() {
 				batch.Queue("INSERT INTO "+p.sinkPostgresSQLCfg.TableName+" VALUES ("+strings.Join(symbols, ", ")+")", row.Data...)
 
 				batchCounter += 1
-				p.Metrics.OnSinkInputSuccess(p.StreamName, p.SinkAliasName)
+				if p.Metrics != nil {
+					p.Metrics.OnSinkInputSuccess(p.StreamName, p.SinkAliasName)
+				}
 			}
 
 			if batch != nil && batchCounter == p.sinkPostgresSQLCfg.BulkSize {
@@ -157,13 +175,19 @@ func (p *PostgresSQLHandler) InitSink() {
 
 // CloseSink close PostgresSQL connection
 func (p *PostgresSQLHandler) CloseSink() {
-	if p.pgConn != nil {
-		_ = p.pgConn.Close(context.Background())
-	}
 	if p.ticker != nil {
 		p.ticker.Stop()
 	}
+	// Close channel first to let WriteData goroutine exit
 	p.Close()
+	// Wait for WriteData goroutine to fully exit before closing connection
+	if p.done != nil {
+		<-p.done
+	}
+	if p.pgConn != nil {
+		_ = p.pgConn.Close(context.Background())
+		p.pgConn = nil
+	}
 }
 
 func NewPostgresSQLHandler(baseSink sink.BaseSink, sinkPostgresSQLCfg config.PostgresSQLSinkConfig) *PostgresSQLHandler {
@@ -171,6 +195,7 @@ func NewPostgresSQLHandler(baseSink sink.BaseSink, sinkPostgresSQLCfg config.Pos
 		BaseSink:           baseSink,
 		sinkPostgresSQLCfg: sinkPostgresSQLCfg,
 		ticker:             time.NewTicker(time.Duration(defaultFlushTime) * time.Second),
+		done:               make(chan struct{}),
 	}
 	handler.InitSink()
 	handler.SetFromTransformChan()

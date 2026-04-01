@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -19,7 +20,6 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
 	"github.com/valyala/fasthttp"
-	"golang.org/x/exp/mmap"
 
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
@@ -31,8 +31,8 @@ const (
 	defaultApolloNamespace       = "application"
 	defaultApolloCluster         = "default"
 	apolloSyncServerTimeout      = 3
-	defaultNacosLogDir           = "/tmp/nacos/log"
-	defaultNacosCacheDir         = "/tmp/nacos/cache"
+	defaultNacosLogDirSuffix     = "nacos/log"
+	defaultNacosCacheDirSuffix   = "nacos/cache"
 	defaultHeartbeatIntervalSecs = 15
 )
 
@@ -111,17 +111,9 @@ func (c *TunnelConfigLoader) loadFile(data []byte) *TunnelConfig {
 }
 
 func (c *TunnelConfigLoader) loadFromLocal(path string) {
-	// use mmap to load file
-	reader, readerErr := mmap.Open(path)
-	if readerErr != nil {
-		logger.Logger.Fatal("Project configuration file read failed! Error reason: " + readerErr.Error())
-		os.Exit(1)
-	}
-	defer reader.Close()
-	// create cache buffer to get file content
-	data := make([]byte, reader.Len())
-	if _, err := reader.ReadAt(data, 0); err != nil {
-		logger.Logger.Fatal("Project configuration file parsing failed! Error reason: " + err.Error())
+	data, readErr := os.ReadFile(path)
+	if readErr != nil {
+		logger.Logger.Fatal("Project configuration file read failed! Error reason: " + readErr.Error())
 		os.Exit(1)
 	}
 	TunnelCfg = c.loadFile(data)
@@ -306,8 +298,8 @@ func (c *TunnelConfigLoader) loadFromNacos() {
 		NamespaceId:         nacosNamespaceId, // 如果不需要命名空间，可以留空
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              defaultNacosLogDir,
-		CacheDir:            defaultNacosCacheDir,
+		LogDir:              filepath.Join(os.TempDir(), defaultNacosLogDirSuffix),
+		CacheDir:            filepath.Join(os.TempDir(), defaultNacosCacheDirSuffix),
 		LogLevel:            "debug",
 	}
 	// create config client

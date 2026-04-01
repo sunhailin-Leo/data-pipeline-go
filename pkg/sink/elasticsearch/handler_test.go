@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,10 +20,14 @@ func initLogger() {
 }
 
 func TestNewElasticsearchSinkHandler(t *testing.T) {
-	t.Helper()
-	// init logger
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink config
+
+	esAddr := testutil.GetEnvOrDefault(testutil.EnvESAddr, "http://localhost:9200")
+	esUser := testutil.GetEnvOrDefault(testutil.EnvESUser, "elastic")
+	esPass := testutil.GetEnvOrDefault(testutil.EnvESPass, "testpass")
+
 	base := sink.BaseSink{
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 		StreamName:    "",
@@ -34,19 +39,18 @@ func TestNewElasticsearchSinkHandler(t *testing.T) {
 		Type:     utils.SinkElasticsearchTagName,
 		SinkName: "elasticsearch-1",
 		Elasticsearch: config.ElasticsearchSinkConfig{
-			Address:   "<test address>",
-			Username:  "admin",
-			Password:  "<test password>",
-			IndexName: "<test document>",
+			Address:   esAddr,
+			Username:  esUser,
+			Password:  esPass,
+			IndexName: "integration-test-index",
 			DocIdName: "id",
 			Version:   "7.X",
 		},
 	}
-	// init ElasticsearchSinkHandler
+
 	elasticsearchClient := NewElasticsearchSinkHandler(base, testSinkConfig.Elasticsearch)
-	// Sink Write
 	go elasticsearchClient.WriteData()
-	// Channel
+
 	e := elasticsearchClient.GetFromTransformChan()
 	for i := 1; i < 5; i++ {
 		e <- &models.TransformOutput{
@@ -57,8 +61,7 @@ func TestNewElasticsearchSinkHandler(t *testing.T) {
 			SinkName: "elasticsearch-1",
 		}
 	}
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
 
+	time.Sleep(5 * time.Second)
 	elasticsearchClient.CloseSink()
 }

@@ -81,7 +81,7 @@ func (b *BaseSink) SetDebugMode(debug bool) {
 }
 
 func (b *BaseSink) MessageCommit(client, message interface{}, configName string, params ...interface{}) {
-	if b.StreamConfig.SourceAckMode == utils.AckModeInSink {
+	if b.StreamConfig != nil && b.StreamConfig.SourceAckMode == utils.AckModeInSink {
 		commiter.MessageCommit(client, message, configName, params)
 	}
 }

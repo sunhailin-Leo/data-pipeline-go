@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 )
 
 func initLogger() {
@@ -18,10 +19,15 @@ func initLogger() {
 }
 
 func TestNewClickhouseSink(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink Clickhouse Test
+
+	clickhouseAddr := testutil.GetEnvOrDefault(testutil.EnvClickhouseAddr, "localhost:9000")
+	clickhouseUser := testutil.GetEnvOrDefault(testutil.EnvClickhouseUser, "default")
+	clickhousePass := testutil.GetEnvOrDefault(testutil.EnvClickhousePass, "testpass")
+	clickhouseDB := testutil.GetEnvOrDefault(testutil.EnvClickhouseDB, "integration_test")
+
 	base := sink.BaseSink{
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 		StreamName:    "",
@@ -29,25 +35,27 @@ func TestNewClickhouseSink(t *testing.T) {
 		ChanSize:      100,
 	}
 	testClickhouseConfig := config.ClickhouseSinkConfig{
-		Address:   "<test address>",
-		Username:  "<test username>",
-		Password:  "<test password>",
-		Database:  "ai_group_test",
-		TableName: "test",
+		Address:           clickhouseAddr,
+		Username:          clickhouseUser,
+		Password:          clickhousePass,
+		Database:          clickhouseDB,
+		TableName:         "integration_test_table",
+		IsAutoCreateTable: true,
 		Columns: []config.ClickhouseTableColumn{
 			{Name: "col1", Type: "Int32"},
 			{Name: "col2", Type: "Float32"},
 			{Name: "col3", Type: "String"},
 		},
+		Engine:   "MergeTree",
+		OrderBy:  []string{"col1"},
 		BulkSize: 5,
 	}
+
 	ckClient := NewClickhouseSink(base, testClickhouseConfig)
-	// Sink Write
 	go ckClient.WriteData()
 
-	// channel
 	c := ckClient.GetFromTransformChan()
-	for i := 1; i < 100; i++ {
+	for i := 1; i < 20; i++ {
 		c <- &models.TransformOutput{
 			SourceOutput: &models.SourceOutput{},
 			Data: []any{
@@ -59,8 +67,6 @@ func TestNewClickhouseSink(t *testing.T) {
 		}
 	}
 
-	// for waiting data insert
-	time.Sleep(20 * time.Second)
-
+	time.Sleep(5 * time.Second)
 	ckClient.CloseSink()
 }

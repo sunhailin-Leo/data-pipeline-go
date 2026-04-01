@@ -4,7 +4,9 @@ import (
 	"context"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/logger"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/source"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,26 +22,14 @@ func initLogger() {
 	logger.NewZapLogger()
 }
 
-func testRedisPublisherMock(channelName string) {
-	client := redis.NewUniversalClient(&redis.UniversalOptions{
-		Addrs:    strings.Split("<Redis address>", ","),
-		Password: "<Redis password>",
-	})
-
-	for i := 0; i < 10; i++ {
-		result := client.Publish(context.Background(), channelName, "test-msg-"+strconv.Itoa(i))
-		if result.Err() != nil {
-			panic(result.Err())
-		} else {
-			println(result.String())
-		}
-	}
-}
-
 func TestNewRedisSourceHandler(t *testing.T) {
-	t.Helper()
-	// Pre-Test
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
+
+	redisAddr := testutil.GetEnvOrDefault(testutil.EnvRedisAddr, "localhost:6379")
+	channelName := "integration-test-channel"
+
 	// Source - Subscribe
 	baseSource := source.BaseSource{
 		ChanSize:        100,
@@ -49,31 +40,62 @@ func TestNewRedisSourceHandler(t *testing.T) {
 			SourceName: "redis-1",
 			Redis: config.RedisSourceConfig{
 				DBNum:            0,
-				KeyOrChannelName: "alg-test-redis",
-				Address:          "<Redis address>",
-				Password:         "<Redis password>",
+				KeyOrChannelName: channelName,
+				Address:          redisAddr,
 				DataType:         utils.RedisDataTypeSubscribe,
 			},
 		},
 		Metrics: middlewares.NewMetrics("data_tunnel"),
 	}
 	r := NewRedisSourceHandler(baseSource)
-	// redis.SetDebugMode(true)
 	c := r.GetToTransformChan()
 
-	// Consumer - FetchData
-	go r.FetchData()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		r.FetchData()
+	}()
+
+	// Wait for subscription to be established
+	time.Sleep(2 * time.Second)
+
 	// Publisher
-	testRedisPublisherMock("alg-test-redis")
+	publisher := redis.NewUniversalClient(&redis.UniversalOptions{
+		Addrs: strings.Split(redisAddr, ","),
+	})
+	defer publisher.Close()
+
+	for i := 0; i < 10; i++ {
+		result := publisher.Publish(context.Background(), channelName, "test-msg-"+strconv.Itoa(i))
+		if result.Err() != nil {
+			t.Fatalf("Failed to publish message: %v", result.Err())
+		}
+	}
+
+	// Wait a bit for message to be delivered
+	time.Sleep(500 * time.Millisecond)
 
 	fetchData, ok := <-c
 	if !ok || fetchData == nil {
 		t.Fatalf("Fetch data from Redis failed")
 	}
 
-	// Parse Data
 	fetchMessage := fetchData.SourceData.(string)
-	println(fetchMessage)
+	t.Logf("Received message: %s", fetchMessage)
 
+	// Drain remaining messages from channel to prevent FetchData from blocking on send
+	done := make(chan struct{})
+	go func() {
+		for range c {
+		}
+		close(done)
+	}()
+
+	// CloseSource closes pubsub (which exits FetchData's for-range loop) then closes channel
 	r.CloseSource()
+	// Wait for drain goroutine to finish
+	<-done
+	// Wait for FetchData goroutine to fully exit
+	wg.Wait()
 }

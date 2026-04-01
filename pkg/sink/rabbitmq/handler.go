@@ -42,13 +42,19 @@ func (r *RabbitMQSinkHandler) WriteData() {
 		}
 
 		data, ok := <-r.GetFromTransformChan()
-		r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInput(r.StreamName, r.SinkAliasName)
+		}
 		if !ok {
 			logger.Logger.Error(utils.LogServiceName + "[RabbitMQ-Sink][Current config: " + r.SinkAliasName + "]数据源已关闭!")
 			return
 		}
-		r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
-		r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		if r.Metrics != nil {
+			r.Metrics.OnSinkInputSuccess(r.StreamName, r.SinkAliasName)
+		}
+		if r.Metrics != nil {
+			r.Metrics.OnSinkOutput(r.StreamName, r.SinkAliasName)
+		}
 
 		confirms, publishErr := r.rmqPublisher.PublishWithDeferredConfirmWithContext(
 			context.Background(),
@@ -73,8 +79,12 @@ func (r *RabbitMQSinkHandler) WriteData() {
 		}
 
 		if isConfirm {
-			r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
-			r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			if r.Metrics != nil {
+				r.Metrics.OnSinkOutputSuccess(r.StreamName, r.SinkAliasName)
+			}
+			if data.SourceOutput != nil && data.MetaData != nil {
+				r.MessageCommit(data.SourceObj, data.SourceData, r.SinkAliasName)
+			}
 		}
 	}
 }

@@ -26,6 +26,7 @@ type RedisSourceHandler struct {
 	sourceRedisCfg config.RedisSourceConfig
 	redisClient    redis.UniversalClient
 	redisPubSub    *redis.PubSub
+	done           chan struct{}
 }
 
 // SourceName returns the name of the Redis source
@@ -40,6 +41,12 @@ func (r *RedisSourceHandler) SourceTopic() string {
 
 // FetchData fetches data from Redis
 func (r *RedisSourceHandler) FetchData() {
+	defer func() {
+		if r.done != nil {
+			close(r.done)
+		}
+	}()
+
 	logger.Logger.Info(utils.LogServiceName +
 		"[Redis-Source][Current config: " + r.SourceAliasName + "]Start waiting for data to be written...")
 
@@ -47,7 +54,7 @@ func (r *RedisSourceHandler) FetchData() {
 	case utils.RedisDataTypeSubscribe:
 		for msg := range r.redisPubSub.Channel() {
 			if r.redisClient == nil {
-				logger.Logger.Fatal(utils.LogServiceName +
+				logger.Logger.Error(utils.LogServiceName +
 					"[Redis-Source][Current config: " + r.SourceAliasName + "]Redis client is already closed or not connected!")
 				return
 			}
@@ -133,8 +140,17 @@ func (r *RedisSourceHandler) InitSource() {
 
 // CloseSource closes the Redis source
 func (r *RedisSourceHandler) CloseSource() {
+	if r.redisPubSub != nil {
+		_ = r.redisPubSub.Close()
+		r.redisPubSub = nil
+	}
 	if r.redisClient != nil {
 		_ = r.redisClient.Close()
+		r.redisClient = nil
+	}
+	// Wait for FetchData goroutine to exit before closing channel
+	if r.done != nil {
+		<-r.done
 	}
 	r.Close()
 }
@@ -144,6 +160,7 @@ func NewRedisSourceHandler(baseSource source.BaseSource) *RedisSourceHandler {
 	handler := &RedisSourceHandler{
 		BaseSource:     baseSource,
 		sourceRedisCfg: baseSource.SourceConfig.Redis,
+		done:           make(chan struct{}),
 	}
 	handler.InitSource()
 	handler.SetToTransformChan()

@@ -44,7 +44,9 @@ func (h *HTTPSinkHandler) sendData(data []any) {
 	}
 	req.SetBody(data[0].([]byte))
 
-	h.Metrics.OnSinkOutput(h.StreamName, h.SinkAliasName)
+	if h.Metrics != nil {
+		h.Metrics.OnSinkOutput(h.StreamName, h.SinkAliasName)
+	}
 
 	// response
 	if err := h.httpClient.DoTimeout(req, nil, defaultTimeout); err != nil {
@@ -53,7 +55,9 @@ func (h *HTTPSinkHandler) sendData(data []any) {
 		return
 	}
 	logger.Logger.Info(utils.LogServiceName + "[HTTP-Sink][Current config: " + h.SinkAliasName + "]send data successful!")
-	h.Metrics.OnSinkOutputSuccess(h.StreamName, h.SinkAliasName)
+	if h.Metrics != nil {
+		h.Metrics.OnSinkOutputSuccess(h.StreamName, h.SinkAliasName)
+	}
 }
 
 func (h *HTTPSinkHandler) WriteData() {
@@ -76,12 +80,16 @@ func (h *HTTPSinkHandler) WriteData() {
 		logger.Logger.Debug(utils.LogServiceName +
 			"[HTTP-Sink][Current config: " + h.SinkAliasName + "]Receive data: " + string(data.Data[0].([]byte)))
 
-		h.Metrics.OnSinkInput(h.StreamName, h.SinkAliasName)
-		h.Metrics.OnSinkInputSuccess(h.StreamName, h.SinkAliasName)
+		if h.Metrics != nil {
+			h.Metrics.OnSinkInput(h.StreamName, h.SinkAliasName)
+			h.Metrics.OnSinkInputSuccess(h.StreamName, h.SinkAliasName)
+		}
 
 		// send data
 		h.sendData(data.Data)
-		h.MessageCommit(data.SourceObj, data.SourceData, h.SinkAliasName)
+		if data.SourceOutput != nil && data.MetaData != nil {
+			h.MessageCommit(data.SourceObj, data.SourceData, h.SinkAliasName)
+		}
 	}
 }
 

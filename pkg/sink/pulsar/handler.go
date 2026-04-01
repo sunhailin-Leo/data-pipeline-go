@@ -35,19 +35,29 @@ func (p *PulsarSinkHandler) WriteData() {
 			return
 		}
 		data, ok := <-p.GetFromTransformChan()
-		p.Metrics.OnSinkInput(p.StreamName, p.SinkAliasName)
+		if p.Metrics != nil {
+			p.Metrics.OnSinkInput(p.StreamName, p.SinkAliasName)
+		}
 		if !ok {
 			logger.Logger.Error(utils.LogServiceName + "[Pulsar-Sink][Current config: " + p.SinkAliasName + "]Sink is already closed!")
 			return
 		}
-		p.Metrics.OnSinkInputSuccess(p.StreamName, p.SinkAliasName)
-		p.Metrics.OnSinkOutput(p.StreamName, p.SinkAliasName)
+		if p.Metrics != nil {
+			p.Metrics.OnSinkInputSuccess(p.StreamName, p.SinkAliasName)
+		}
+		if p.Metrics != nil {
+			p.Metrics.OnSinkOutput(p.StreamName, p.SinkAliasName)
+		}
 		if msgId, sendErr := p.producer.Send(context.Background(), &pulsar.ProducerMessage{Payload: data.Data[0].([]byte)}); sendErr != nil {
 			logger.Logger.Error(utils.LogServiceName + "[Pulsar-Sink][Current config: " + p.SinkAliasName + "]Send message error! Reason for exception: " + sendErr.Error())
 		} else {
 			logger.Logger.Debug(utils.LogServiceName + "[Pulsar-Sink][Current config: " + p.SinkAliasName + "]Message ID: " + msgId.String())
-			p.Metrics.OnSinkOutputSuccess(p.StreamName, p.SinkAliasName)
-			p.MessageCommit(data.SourceObj, data.SourceData, p.SinkAliasName)
+			if p.Metrics != nil {
+				p.Metrics.OnSinkOutputSuccess(p.StreamName, p.SinkAliasName)
+			}
+			if data.SourceOutput != nil && data.MetaData != nil {
+				p.MessageCommit(data.SourceObj, data.SourceData, p.SinkAliasName)
+			}
 		}
 	}
 }

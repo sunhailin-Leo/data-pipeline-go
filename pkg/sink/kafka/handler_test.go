@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,10 +20,12 @@ func initLogger() {
 }
 
 func TestNewKafkaSinkHandler(t *testing.T) {
-	t.Helper()
-	// init logger
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink config
+
+	kafkaAddr := testutil.GetEnvOrDefault(testutil.EnvKafkaAddr, "localhost:9092")
+
 	base := sink.BaseSink{
 		Metrics:       middlewares.NewMetrics("data_tunnel"),
 		StreamName:    "",
@@ -34,16 +37,15 @@ func TestNewKafkaSinkHandler(t *testing.T) {
 		Type:     utils.SinkKafkaTagName,
 		SinkName: "kafka-1",
 		Kafka: config.KafkaSinkConfig{
-			Address:     "<test kafka hosts>",
-			Topic:       "<test kafka topic>",
+			Address:     kafkaAddr,
+			Topic:       "integration-test-topic",
 			MessageMode: "json",
 		},
 	}
-	// init KafkaSinkHandler
+
 	kafkaClient := NewKafkaSinkHandler(base, testSinkConfig.Kafka)
-	// Sink Write
 	go kafkaClient.WriteData()
-	// Channel
+
 	k := kafkaClient.GetFromTransformChan()
 	for i := 1; i < 5; i++ {
 		k <- &models.TransformOutput{
@@ -54,8 +56,7 @@ func TestNewKafkaSinkHandler(t *testing.T) {
 			SinkName: "kafka-1",
 		}
 	}
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
 
+	time.Sleep(5 * time.Second)
 	kafkaClient.CloseSink()
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/middlewares"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/models"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
+	"github.com/sunhailin-Leo/data-pipeline-go/pkg/testutil"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/utils"
 )
 
@@ -19,10 +20,12 @@ func initLogger() {
 }
 
 func TestNewPulsarSinkHandler(t *testing.T) {
-	t.Helper()
-	// 初始化日志
+	testutil.SkipIfNotIntegration(t)
+
 	initLogger()
-	// Sink 配置
+
+	pulsarAddr := testutil.GetEnvOrDefault(testutil.EnvPulsarAddr, "localhost:6650")
+
 	base := sink.BaseSink{
 		DebugMode:     false,
 		StreamName:    "",
@@ -34,17 +37,16 @@ func TestNewPulsarSinkHandler(t *testing.T) {
 		Type:     utils.SinkPulsarTagName,
 		SinkName: "pulsar-1",
 		Pulsar: config.PulsarSinkConfig{
-			Address: "172.20.49.19:16650",
-			Topic:   "alg_test",
+			Address: pulsarAddr,
+			Topic:   "integration-test-topic",
 		},
 	}
-	// 初始化
+
 	pulsarClient := NewPulsarSinkHandler(base, testSinkConfig.Pulsar)
-	// Sink Write
 	go pulsarClient.WriteData()
-	// Channel
+
 	p := pulsarClient.GetFromTransformChan()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 5; i++ {
 		p <- &models.TransformOutput{
 			SourceOutput: &models.SourceOutput{},
 			Data: []any{
@@ -53,8 +55,7 @@ func TestNewPulsarSinkHandler(t *testing.T) {
 			SinkName: "pulsar-1",
 		}
 	}
-	// for waiting data insert
-	time.Sleep(10 * time.Second)
 
+	time.Sleep(5 * time.Second)
 	pulsarClient.CloseSink()
 }

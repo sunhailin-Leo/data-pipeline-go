@@ -1,6 +1,7 @@
 package sink
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -13,8 +14,12 @@ import (
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/sink"
 )
 
+var loggerOnce sync.Once
+
 func initLogger() {
-	logger.NewZapLogger()
+	loggerOnce.Do(func() {
+		logger.NewZapLogger()
+	})
 }
 
 func TestNewConsoleSinkHandler(t *testing.T) {
@@ -29,8 +34,13 @@ func TestNewConsoleSinkHandler(t *testing.T) {
 		ChanSize:      100,
 	}
 	consoleClient := NewConsoleSinkHandler(base)
-	// Sink Write
-	go consoleClient.WriteData()
+	// Sink Write with WaitGroup to synchronize goroutine exit
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		consoleClient.WriteData()
+	}()
 
 	// channel
 	c := consoleClient.GetFromTransformChan()
@@ -47,10 +57,10 @@ func TestNewConsoleSinkHandler(t *testing.T) {
 		}
 	}
 
-	// for waiting data insert
-	time.Sleep(20 * time.Second)
-
-	consoleClient.CloseSink()
+	// Wait for all data to be processed, then close channel and wait for goroutine exit
+	time.Sleep(2 * time.Second)
+	consoleClient.Close()
+	wg.Wait()
 }
 
 func TestConsoleSinkName(t *testing.T) {

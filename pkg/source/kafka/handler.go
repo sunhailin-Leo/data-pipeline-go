@@ -37,7 +37,7 @@ func (k *KafkaSourceHandler) FetchData() {
 		"[Kafka-Source][Current config: " + k.SourceAliasName + "]Starting to consume data...")
 	for {
 		if k.kafkaClient == nil {
-			logger.Logger.Fatal(utils.LogServiceName +
+			logger.Logger.Error(utils.LogServiceName +
 				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka client is closed or not configured!")
 			return
 		}
@@ -47,7 +47,7 @@ func (k *KafkaSourceHandler) FetchData() {
 			return
 		}
 		fetches.EachError(func(s string, i int32, err error) {
-			logger.Logger.Fatal(utils.LogServiceName +
+			logger.Logger.Error(utils.LogServiceName +
 				"[Kafka-Source][Current config: " + k.SourceAliasName + "]Kafka consume error! Error reason: " +
 				"fetch err topic " + s + " partition " + string(i) + " err " + err.Error())
 		})
@@ -86,9 +86,11 @@ func (k *KafkaSourceHandler) InitSource() {
 		kgo.SeedBrokers(strings.Split(k.sourceAddress, ",")...),
 		kgo.WithHooks(metrics),
 		kgo.ConsumeTopics(k.sourceTopic),
-		kgo.ConsumerGroup(k.sourceGroup),
-		kgo.DisableAutoCommit(),
+		kgo.ConsumeResetOffset(kgo.NewOffset().AtStart()),
 		kgo.WithLogger(l),
+	}
+	if k.sourceGroup != "" {
+		opts = append(opts, kgo.ConsumerGroup(k.sourceGroup), kgo.DisableAutoCommit())
 	}
 	// kgo sasl
 	if k.SourceConfig.Kafka.User != "" && k.SourceConfig.Kafka.Password != "" {
@@ -97,7 +99,7 @@ func (k *KafkaSourceHandler) InitSource() {
 
 	kgoClient, clientErr := kgo.NewClient(opts...)
 	if clientErr != nil {
-		logger.Logger.Fatal(utils.LogServiceName +
+		logger.Logger.Error(utils.LogServiceName +
 			"[Kafka-Source][Current config: " + k.SourceAliasName + "]Failed to create Kafka client! Reason for exception: " + clientErr.Error())
 		return
 	}
@@ -120,16 +122,11 @@ func (k *KafkaSourceHandler) CloseSource() {
 
 // NewKafkaSource initializes a new Kafka source handler
 func NewKafkaSource(baseSource source.BaseSource) *KafkaSourceHandler {
-	sourceGroup := baseSource.SourceConfig.Kafka.Group
-	if sourceGroup == "" {
-		sourceGroup = utils.ServiceName
-	}
-
 	handler := &KafkaSourceHandler{
 		BaseSource:    baseSource,
 		sourceAddress: baseSource.SourceConfig.Kafka.Address,
 		sourceTopic:   baseSource.SourceConfig.Kafka.Topic,
-		sourceGroup:   sourceGroup,
+		sourceGroup:   baseSource.SourceConfig.Kafka.Group,
 	}
 	handler.InitSource()
 	handler.SetToTransformChan()
