@@ -1,6 +1,7 @@
 package sink
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -20,6 +21,10 @@ func initLogger() {
 
 func TestNewOracleSinkHandler(t *testing.T) {
 	testutil.SkipIfNotIntegration(t)
+
+	if os.Getenv(testutil.EnvOracleAddr) == "" {
+		t.Skip("Skipping Oracle test: set INTEGRATION_ORACLE_ADDR to run")
+	}
 
 	initLogger()
 
