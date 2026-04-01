@@ -153,7 +153,8 @@ func (s *Handler) Start() {
 func (s *Handler) startMetrics() {
 	http.Handle(utils.PromHTTPRoute, s.metrics.Handler())
 	metricsServer = &http.Server{
-		Addr: ":" + utils.PromHTTPServerPort,
+		Addr:              ":" + utils.PromHTTPServerPort,
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 	go func() {
 		if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
