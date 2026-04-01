@@ -26,155 +26,6 @@ jobs:
     name: Integration Test (Linux)
     runs-on: ubuntu-latest
 
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 5
-
-      kafka:
-        image: apache/kafka:latest
-        ports:
-          - 9092:9092
-        env:
-          KAFKA_NODE_ID: 1
-          KAFKA_PROCESS_ROLES: broker,controller
-          KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-          KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-          KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-          CLUSTER_ID: integration-test-cluster-id
-        options: >-
-          --health-cmd "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-          --health-start-period 30s
-
-      mysql:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: testpass
-          MYSQL_DATABASE: integration_test
-        options: >-
-          --health-cmd "mysqladmin ping -h localhost -ptestpass"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-          --health-start-period 20s
-
-      postgres:
-        image: postgres:16-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: integration_test
-        options: >-
-          --health-cmd "pg_isready -U testuser -d integration_test"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-
-      clickhouse:
-        image: clickhouse/clickhouse-server:24
-        ports:
-          - 8123:8123
-          - 9000:9000
-        env:
-          CLICKHOUSE_USER: default
-          CLICKHOUSE_PASSWORD: testpass
-          CLICKHOUSE_DB: integration_test
-        options: >-
-          --health-cmd "clickhouse-client --query 'SELECT 1'"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-          --health-start-period 10s
-
-      rabbitmq:
-        image: rabbitmq:3-management-alpine
-        ports:
-          - 5672:5672
-          - 15672:15672
-        env:
-          RABBITMQ_DEFAULT_USER: testuser
-          RABBITMQ_DEFAULT_PASS: testpass
-        options: >-
-          --health-cmd "rabbitmq-diagnostics -q ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-          --health-start-period 15s
-
-      rocketmq-namesrv:
-        image: apache/rocketmq:5.3.1
-        ports:
-          - 9876:9876
-        options: >-
-          --health-cmd "bash -c 'echo > /dev/tcp/localhost/9876' || exit 1"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-          --health-start-period 15s
-        env:
-          HEAP_OPTS: "-Xms256m -Xmx256m -Xmn128m"
-
-      rocketmq-broker:
-        image: apache/rocketmq:5.3.1
-        ports:
-          - 10911:10911
-          - 10909:10909
-        env:
-          HEAP_OPTS: "-Xms512m -Xmx512m -Xmn256m"
-          NAMESRV_ADDR: rocketmq-namesrv:9876
-        options: >-
-          --health-cmd "bash -c 'echo > /dev/tcp/localhost/10911' || exit 1"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 15
-          --health-start-period 30s
-
-      pulsar:
-        image: apachepulsar/pulsar:3.3.4
-        ports:
-          - 6650:6650
-          - 8080:8080
-        env:
-          PULSAR_MEM: "-Xms256m -Xmx256m"
-        options: >-
-          --health-cmd "bin/pulsar-admin brokers healthcheck || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 15
-          --health-start-period 30s
-
-      elasticsearch:
-        image: elasticsearch:7.17.27
-        ports:
-          - 9200:9200
-        env:
-          discovery.type: single-node
-          ES_JAVA_OPTS: "-Xms256m -Xmx256m"
-          ELASTIC_PASSWORD: testpass
-          xpack.security.enabled: "true"
-        options: >-
-          --health-cmd "curl -s -u elastic:testpass http://localhost:9200/_cluster/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 15
-          --health-start-period 30s
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -182,8 +33,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.25'
+          go-version-file: 'go.mod'
           cache: true
+
+      - name: Start services
+        run: docker compose -f docker-compose.integration.yml up -d --wait --wait-timeout 120
 
       - name: Download dependencies
         run: go mod download
@@ -215,6 +69,10 @@ jobs:
           INTEGRATION_ES_PASS: testpass
         run: go test -v -race -timeout 180s ./pkg/sink/... ./pkg/source/...
 
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose.integration.yml down -v
+
   integration-test-macos:
     name: Integration Test (macOS)
     runs-on: macos-latest
@@ -226,7 +84,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.25'
+          go-version-file: 'go.mod'
           cache: true
 
       - name: Install Docker
@@ -282,7 +140,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.25'
+          go-version-file: 'go.mod'
           cache: true
 
       - name: Start Docker services
