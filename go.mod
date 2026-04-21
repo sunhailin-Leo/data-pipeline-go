@@ -4,7 +4,7 @@ go 1.25.8
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.45.0
-	github.com/apache/pulsar-client-go v0.18.0
+	github.com/apache/pulsar-client-go v0.19.0
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/bytedance/go-tagexpr/v2 v2.9.11
