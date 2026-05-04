@@ -13,7 +13,7 @@ require (
 	github.com/cloudwego/gjson v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.10
 	github.com/elastic/go-elasticsearch/v8 v8.19.5
-	github.com/go-sql-driver/mysql v1.9.3
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/go-zookeeper/zk v1.0.4
 	github.com/jackc/pgx/v5 v5.9.2
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
@@ -36,7 +36,7 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.1.1 // indirect
+	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/AthenZ/athenz v1.12.13 // indirect
 	github.com/ClickHouse/ch-go v0.71.0 // indirect
 	github.com/DataDog/zstd v1.5.0 // indirect
