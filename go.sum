@@ -609,8 +609,8 @@ github.com/tklauser/numcpus v0.6.1 h1:ng9scYS7az0Bk4OZLvrNXNSAO2Pxr1XXRAPyjhIx+F
 github.com/tklauser/numcpus v0.6.1/go.mod h1:1XfjsgE2zo8GVw7POkMbHENHzVg3GzmoZ9fESEdAacY=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
-github.com/twmb/franz-go v1.21.0 h1:J3uB/poWgHD6VIilER2uCPFAZHDRXVFT+11pBgRKod4=
-github.com/twmb/franz-go v1.21.0/go.mod h1:1o+jj5oRbItsIMoE+DGpfJIcPcPtDdtkcNFPj4bWNwU=
+github.com/twmb/franz-go v1.21.1 h1:sp17bMRLz6OB/w+7vHtBadHGIQVymzQHwvRbEKe5c4I=
+github.com/twmb/franz-go v1.21.1/go.mod h1:1o+jj5oRbItsIMoE+DGpfJIcPcPtDdtkcNFPj4bWNwU=
 github.com/twmb/franz-go/pkg/kmsg v1.13.1 h1:fG5kItwysTk5UXqVwb64EpQEy3TydF3vYYK21nUQ+bI=
 github.com/twmb/franz-go/pkg/kmsg v1.13.1/go.mod h1:+DPt4NC8RmI6hqb8G09+3giKObE6uD2Eya6CfqBpeJY=
 github.com/twmb/franz-go/plugin/kprom v1.4.0 h1:gRdB03h/BoBTIgr3obudwio6q3FbrFvbjk4LjO0DTgs=
