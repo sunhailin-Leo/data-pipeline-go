@@ -12,11 +12,12 @@ Supported list:
         - [X] Subscribe(default using PSubscribe)
 - [X] Pulsar
 - [X] RabbitMQ
+- [X] NSQ
 - [X] Prometheus metrics exporter(etc. get /metrics)
 
 ## ACK Mode
 
-In Stream configuration, the `ack_mode` field controls the message acknowledgment timing, only effective for MQ-type Sources (Kafka, RocketMQ, RabbitMQ, Pulsar):
+In Stream configuration, the `ack_mode` field controls the message acknowledgment timing, only effective for MQ-type Sources (Kafka, RocketMQ, RabbitMQ, Pulsar, NSQ):
 
 | Value | Mode | Description |
 |-------|------|-------------|
@@ -133,3 +134,17 @@ Type: Object
         "data_type": "<Data Type>"                          // Data type, e.g. "lpop", "rpop" or "subscribe"
     }
 ```
+
+### nsq
+Type: Object
+```json
+    "nsq": {
+        "address": "<NSQD Hosts>",                  // nsqd address, e.g. "nsqd1.example.com:4150,nsqd2.example.com:4150"
+        "lookupd_address": "<NSQLookupd Hosts>",    // optional nsqlookupd HTTP address, e.g. "http://lookupd.example.com:4161"
+        "topic": "<NSQ Topic>",                     // NSQ topic to consume
+        "channel": "<NSQ Channel>",                 // NSQ channel
+        "max_in_flight": 100                        // optional max in-flight messages
+    }
+```
+
+`topic` and `channel` are required. When `lookupd_address` is non-empty, the source discovers nsqd through nsqlookupd. Otherwise it connects directly to `address`. Both fields support comma-separated addresses.

@@ -15,6 +15,7 @@
             - [X] Subscribe(default using PSubscribe)
     - [X] Pulsar
     - [X] RabbitMQ
+    - [X] NSQ
     - [X] Prometheus metrics exporter(etc. get /metrics)
 - [X] Sink
     - [X] ClickHouse

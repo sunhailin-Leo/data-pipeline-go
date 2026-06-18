@@ -38,7 +38,7 @@ A SeaTunnel-like data synchronization tool built with Go, designed for **simplic
 
 ## Core Architecture
 
-- **Source**: Kafka, RocketMQ, RabbitMQ, Pulsar, Redis, Prometheus Metrics
+- **Source**: Kafka, RocketMQ, RabbitMQ, Pulsar, Redis, NSQ, Prometheus Metrics
 - **Transform**: Three modes (Row, JSON, JsonPath) with type casting, field filtering, field expansion, and row-level data filtering
 - **Sink**: ClickHouse, Console, HTTP, Kafka, Redis, PostgreSQL, MySQL, Oracle, Elasticsearch 7/8, LocalFile, Pulsar, RocketMQ, RabbitMQ
 - **Stream**: Channels connect modules, ants goroutine pool manages concurrency, multi-source Fan-in merging

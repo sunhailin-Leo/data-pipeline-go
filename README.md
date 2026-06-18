@@ -38,7 +38,7 @@
 
 ## 核心架构说明
 
-- **Source（数据源）**：Kafka、RocketMQ、RabbitMQ、Pulsar、Redis、Prometheus Metrics
+- **Source（数据源）**：Kafka、RocketMQ、RabbitMQ、Pulsar、Redis、NSQ、Prometheus Metrics
 - **Transform（数据转换）**：Row、JSON、JsonPath 三种模式，类型转换、字段过滤、字段扩展、行级数据过滤
 - **Sink（数据输出）**：ClickHouse、Console、HTTP、Kafka、Redis、PostgreSQL、MySQL、Oracle、Elasticsearch 7/8、LocalFile、Pulsar、RocketMQ、RabbitMQ
 - **Stream（流管理）**：Channel 连接各模块，ants 协程池管理并发，支持多源 Fan-in 合并

@@ -2,6 +2,7 @@ package transform
 
 import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/nsqio/go-nsq"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"github.com/wagslane/go-rabbitmq"
 
@@ -34,6 +35,10 @@ func (t *Handler) sourceDataSelector(sourceData *models.SourceOutput) any {
 		return rabbitMQRecord.Body
 	case utils.SourcePromMetricsTagName:
 		return sourceData.SourceData.([]byte)
+	case utils.SourceNSQTagName:
+		nsqRecord := sourceData.SourceData.(*nsq.Message)
+		// NSQ 下游只需要消息体，ACK 信息保留在 MetaData.SourceObj。
+		return nsqRecord.Body
 	default:
 		return sourceData.SourceData
 	}

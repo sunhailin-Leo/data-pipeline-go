@@ -17,6 +17,7 @@ require (
 	github.com/go-zookeeper/zk v1.0.4
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
+	github.com/nsqio/go-nsq v1.1.0
 	github.com/panjf2000/ants/v2 v2.12.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.68.1
@@ -90,6 +91,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect

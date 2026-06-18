@@ -45,3 +45,11 @@ type RedisSourceConfig struct {
 	Password         string `json:"password"`            // Redis password
 	DataType         string `json:"data_type"`           // data type: lpop, rpop, subscribe
 }
+
+type NSQSourceConfig struct {
+	Address        string `json:"address"`         // nsqd TCP 地址，支持逗号分隔
+	LookupdAddress string `json:"lookupd_address"` // nsqlookupd HTTP 地址，支持逗号分隔
+	Topic          string `json:"topic"`           // nsq topic
+	Channel        string `json:"channel"`         // nsq channel
+	MaxInFlight    int    `json:"max_in_flight"`   // 最大 in-flight 消息数
+}
