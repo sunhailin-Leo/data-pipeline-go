@@ -127,6 +127,7 @@ func (n *NSQSourceHandler) InitSource() {
 func (n *NSQSourceHandler) CloseSource() {
 	if n.nsqConsumer != nil {
 		n.nsqConsumer.Stop()
+		<-n.nsqConsumer.StopChan
 	}
 	n.Close()
 }
