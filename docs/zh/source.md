@@ -12,11 +12,12 @@ Source
         - [X] Subscribe(default using PSubscribe)
 - [X] Pulsar
 - [X] RabbitMQ
+- [X] NSQ
 - [X] Prometheus metrics exporter(etc. get /metrics)
 
 ## ACK 模式
 
-在 Stream 配置中，`ack_mode` 字段控制消息的确认时机，仅对 MQ 类 Source（Kafka、RocketMQ、RabbitMQ、Pulsar）生效：
+在 Stream 配置中，`ack_mode` 字段控制消息的确认时机，仅对 MQ 类 Source（Kafka、RocketMQ、RabbitMQ、Pulsar、NSQ）生效：
 
 | 值 | 模式 | 说明 |
 |----|------|------|
@@ -133,3 +134,17 @@ Source
         "data_type": "<Data Type>"                          // 数据类型，例如 "lpop"、"rpop"或"subscribe"
     }
 ```
+
+### nsq
+类型: Object
+```json
+    "nsq": {
+        "address": "<NSQD Hosts>",                  // nsqd 地址，例如 "nsqd1.example.com:4150,nsqd2.example.com:4150"
+        "lookupd_address": "<NSQLookupd Hosts>",    // 可选，nsqlookupd HTTP 地址，例如 "http://lookupd.example.com:4161"
+        "topic": "<NSQ Topic>",                     // 要消费的 NSQ topic
+        "channel": "<NSQ Channel>",                 // NSQ channel
+        "max_in_flight": 100                        // 可选，最大并发 in-flight 消息数
+    }
+```
+
+说明：`topic` 和 `channel` 必须配置。`lookupd_address` 非空时优先通过 nsqlookupd 发现 nsqd；否则使用 `address` 直连 nsqd。`address` 与 `lookupd_address` 都支持逗号分隔的多个地址。

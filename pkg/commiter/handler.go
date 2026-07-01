@@ -4,6 +4,7 @@ import (
 	"github.com/apache/pulsar-client-go/pulsar"
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/nsqio/go-nsq"
 	"github.com/twmb/franz-go/pkg/kgo"
 	"github.com/wagslane/go-rabbitmq"
 )
@@ -19,5 +20,7 @@ func MessageCommit(client, message interface{}, configName string, params ...int
 		rabbitmqMessageCommit(&c, configName)
 	case pulsar.Consumer:
 		pulsarMessageCommit(c, message.(pulsar.Message), configName)
+	case *nsq.Message:
+		nsqMessageCommit(c, configName)
 	}
 }

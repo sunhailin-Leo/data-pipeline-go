@@ -13,6 +13,7 @@ type SourceConfig struct {
 	PromMetrics PromMetricsSourceConfig `json:"prom_metrics"`
 	Pulsar      PulsarSourceConfig      `json:"pulsar"`
 	Redis       RedisSourceConfig       `json:"redis"`
+	NSQ         NSQSourceConfig         `json:"nsq"`
 }
 
 // TransformSchema transform unit config

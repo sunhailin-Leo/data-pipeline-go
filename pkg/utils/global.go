@@ -57,6 +57,7 @@ const (
 	SourcePromMetricsTagName string = "PromMetrics"
 	SourcePulsarTagName      string = "Pulsar"
 	SourceRedisTagName       string = "Redis"
+	SourceNSQTagName         string = "NSQ"
 
 	SinkClickhouseTagName    string = "ClickHouse"
 	SinkConsoleTagName       string = "Console"

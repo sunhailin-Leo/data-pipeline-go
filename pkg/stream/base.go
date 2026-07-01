@@ -23,6 +23,7 @@ import (
 	rocketmqSink "github.com/sunhailin-Leo/data-pipeline-go/pkg/sink/rocketmq"
 	"github.com/sunhailin-Leo/data-pipeline-go/pkg/source"
 	kafkaSource "github.com/sunhailin-Leo/data-pipeline-go/pkg/source/kafka"
+	nsqSource "github.com/sunhailin-Leo/data-pipeline-go/pkg/source/nsq"
 	promMetrics "github.com/sunhailin-Leo/data-pipeline-go/pkg/source/prom_metrics"
 	rabbitmqSource "github.com/sunhailin-Leo/data-pipeline-go/pkg/source/rabbitmq"
 	rocketmqSource "github.com/sunhailin-Leo/data-pipeline-go/pkg/source/rocketmq"
@@ -186,6 +187,8 @@ func NewSource(sourceType string, baseSource *source.BaseSource) source.Source {
 		return rabbitmqSource.NewRabbitMQSource(baseSource)
 	case utils.SourcePromMetricsTagName:
 		return promMetrics.NewPromMetricSourceHandler(baseSource)
+	case utils.SourceNSQTagName:
+		return nsqSource.NewNSQSource(baseSource)
 	}
 
 	return nil
