@@ -16,7 +16,7 @@ require (
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/go-zookeeper/zk v1.0.4
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/nacos-group/nacos-sdk-go/v2 v2.3.5
+	github.com/nacos-group/nacos-sdk-go/v2 v2.3.6
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/panjf2000/ants/v2 v2.12.1
 	github.com/prometheus/client_golang v1.24.1
